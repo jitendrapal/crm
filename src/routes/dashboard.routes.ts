@@ -1,5 +1,5 @@
-import { FastifyInstance } from 'fastify';
-import { AuthenticatedRequest, authenticate } from '../middleware/auth';
+import { FastifyInstance, FastifyRequest, FastifyReply } from 'fastify';
+import { authenticate, JWTPayload } from '../middleware/auth';
 import { prisma } from '../lib/prisma';
 
 export async function dashboardRoutes(fastify: FastifyInstance) {
@@ -7,9 +7,10 @@ export async function dashboardRoutes(fastify: FastifyInstance) {
   fastify.addHook('onRequest', authenticate);
 
   // Get dashboard statistics
-  fastify.get('/stats', async (request: AuthenticatedRequest, reply) => {
+  fastify.get('/stats', async (request: FastifyRequest, reply: FastifyReply) => {
     try {
-      const tenantId = request.user!.tenantId;
+      const user = request.user as JWTPayload;
+      const tenantId = user.tenantId;
 
       // Get total customers
       const totalCustomers = await prisma.customer.count({
@@ -51,4 +52,3 @@ export async function dashboardRoutes(fastify: FastifyInstance) {
     }
   });
 }
-

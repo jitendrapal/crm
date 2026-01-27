@@ -2,7 +2,7 @@ import { FastifyInstance, FastifyRequest, FastifyReply } from 'fastify';
 import { invoiceService } from '../services/invoice.service';
 import { pdfService } from '../services/pdf.service';
 import { createInvoiceSchema, updateInvoiceSchema } from '../schemas/invoice.schema';
-import { authenticate } from '../middleware/auth';
+import { authenticate, JWTPayload } from '../middleware/auth';
 import prisma from '../lib/prisma';
 import fs from 'fs';
 
@@ -13,8 +13,9 @@ export async function invoiceRoutes(fastify: FastifyInstance) {
   // Create invoice
   fastify.post('/', async (request: FastifyRequest, reply: FastifyReply) => {
     try {
+      const user = request.user as JWTPayload;
       const data = createInvoiceSchema.parse(request.body);
-      const invoice = await invoiceService.createInvoice(request.user!.tenantId, data);
+      const invoice = await invoiceService.createInvoice(user.tenantId, data);
       reply.code(201).send({ invoice });
     } catch (error: any) {
       reply.code(400).send({ error: error.message });
@@ -24,9 +25,10 @@ export async function invoiceRoutes(fastify: FastifyInstance) {
   // Get all invoices
   fastify.get('/', async (request: FastifyRequest, reply: FastifyReply) => {
     try {
+      const user = request.user as JWTPayload;
       const { page = 1, limit = 10, status, customerId } = request.query as any;
       const result = await invoiceService.getInvoices(
-        request.user!.tenantId,
+        user.tenantId,
         { status, customerId },
         parseInt(page),
         parseInt(limit)
@@ -40,8 +42,9 @@ export async function invoiceRoutes(fastify: FastifyInstance) {
   // Get invoice by ID
   fastify.get('/:id', async (request: FastifyRequest, reply: FastifyReply) => {
     try {
+      const user = request.user as JWTPayload;
       const { id } = request.params as any;
-      const invoice = await invoiceService.getInvoiceById(request.user!.tenantId, id);
+      const invoice = await invoiceService.getInvoiceById(user.tenantId, id);
       reply.send({ invoice });
     } catch (error: any) {
       reply.code(404).send({ error: error.message });
@@ -51,13 +54,10 @@ export async function invoiceRoutes(fastify: FastifyInstance) {
   // Update invoice
   fastify.put('/:id', async (request: FastifyRequest, reply: FastifyReply) => {
     try {
+      const user = request.user as JWTPayload;
       const { id } = request.params as any;
       const data = updateInvoiceSchema.parse(request.body);
-      const invoice = await invoiceService.updateInvoice(
-        request.user!.tenantId,
-        id,
-        data
-      );
+      const invoice = await invoiceService.updateInvoice(user.tenantId, id, data);
       reply.send({ invoice });
     } catch (error: any) {
       reply.code(400).send({ error: error.message });
@@ -67,8 +67,9 @@ export async function invoiceRoutes(fastify: FastifyInstance) {
   // Delete invoice
   fastify.delete('/:id', async (request: FastifyRequest, reply: FastifyReply) => {
     try {
+      const user = request.user as JWTPayload;
       const { id } = request.params as any;
-      await invoiceService.deleteInvoice(request.user!.tenantId, id);
+      await invoiceService.deleteInvoice(user.tenantId, id);
       reply.code(204).send();
     } catch (error: any) {
       reply.code(400).send({ error: error.message });
@@ -78,8 +79,9 @@ export async function invoiceRoutes(fastify: FastifyInstance) {
   // Mark invoice as sent
   fastify.post('/:id/send', async (request: FastifyRequest, reply: FastifyReply) => {
     try {
+      const user = request.user as JWTPayload;
       const { id } = request.params as any;
-      const invoice = await invoiceService.markInvoiceAsSent(request.user!.tenantId, id);
+      const invoice = await invoiceService.markInvoiceAsSent(user.tenantId, id);
       reply.send({ invoice });
     } catch (error: any) {
       reply.code(400).send({ error: error.message });
@@ -89,14 +91,15 @@ export async function invoiceRoutes(fastify: FastifyInstance) {
   // Generate PDF
   fastify.get('/:id/pdf', async (request: FastifyRequest, reply: FastifyReply) => {
     try {
+      const user = request.user as JWTPayload;
       const { id } = request.params as any;
-      const invoice = await invoiceService.getInvoiceById(request.user!.tenantId, id);
+      const invoice = await invoiceService.getInvoiceById(user.tenantId, id);
 
       // Include tenant info for PDF
       const invoiceWithTenant = {
         ...invoice,
         tenant: await prisma.tenant.findUnique({
-          where: { id: request.user!.tenantId },
+          where: { id: user.tenantId },
         }),
       };
 

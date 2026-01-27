@@ -1,7 +1,7 @@
-import { FastifyInstance } from 'fastify';
+import { FastifyInstance, FastifyRequest, FastifyReply } from 'fastify';
 import { authService } from '../services/auth.service';
 import { registerSchema, loginSchema } from '../schemas/auth.schema';
-import { AuthenticatedRequest, authenticate } from '../middleware/auth';
+import { authenticate, JWTPayload } from '../middleware/auth';
 
 export async function authRoutes(fastify: FastifyInstance) {
   // Register
@@ -55,14 +55,14 @@ export async function authRoutes(fastify: FastifyInstance) {
   fastify.get(
     '/me',
     { onRequest: [authenticate] },
-    async (request: AuthenticatedRequest, reply) => {
+    async (request: FastifyRequest, reply: FastifyReply) => {
       try {
-        const user = await authService.getUserById(request.user!.userId);
-        reply.send({ user });
+        const user = request.user as JWTPayload;
+        const userData = await authService.getUserById(user.userId);
+        reply.send({ user: userData });
       } catch (error: any) {
         reply.code(404).send({ error: error.message });
       }
     }
   );
 }
-
