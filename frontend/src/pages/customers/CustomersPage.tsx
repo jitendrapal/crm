@@ -14,13 +14,21 @@ export function CustomersPage() {
   const [page, setPage] = useState(1);
   const queryClient = useQueryClient();
 
-  const { data, isLoading } = useQuery({
+  const { data, isLoading, error } = useQuery({
     queryKey: ['customers', page],
     queryFn: async () => {
-      const response = await api.get<PaginatedResponse<Customer>>(`/customers?page=${page}&limit=10`);
+      const response = await api.get<PaginatedResponse<Customer>>(
+        `/customers?page=${page}&limit=10`
+      );
+      console.log('Customers API Response:', response.data);
       return response.data;
     },
   });
+
+  // Log for debugging
+  console.log('Customers data:', data);
+  console.log('Is loading:', isLoading);
+  console.log('Error:', error);
 
   const deleteMutation = useMutation({
     mutationFn: (id: string) => api.delete(`/customers/${id}`),
@@ -55,9 +63,17 @@ export function CustomersPage() {
       <div className="flex-1 overflow-auto p-6">
         {isLoading ? (
           <div className="text-center py-12">Loading...</div>
+        ) : error ? (
+          <div className="text-center py-12 text-red-500">
+            Error loading customers: {(error as any)?.message || 'Unknown error'}
+          </div>
+        ) : !data?.data || data.data.length === 0 ? (
+          <div className="text-center py-12 text-muted-foreground">
+            No customers found. Click "Add Customer" to create one.
+          </div>
         ) : (
           <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-3">
-            {data?.data.map((customer) => (
+            {data.data.map((customer) => (
               <Card key={customer.id} className="hover:shadow-md transition-shadow">
                 <CardContent className="p-6">
                   <div className="flex items-start justify-between mb-4">
@@ -135,4 +151,3 @@ export function CustomersPage() {
     </div>
   );
 }
-
