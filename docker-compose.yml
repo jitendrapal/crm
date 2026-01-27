@@ -1,0 +1,80 @@
+version: '3.8'
+
+services:
+  # PostgreSQL Database
+  postgres:
+    image: postgres:15-alpine
+    container_name: invoice-crm-db
+    restart: unless-stopped
+    environment:
+      POSTGRES_USER: invoice_user
+      POSTGRES_PASSWORD: invoice_password
+      POSTGRES_DB: invoice_crm
+    ports:
+      - "5432:5432"
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U invoice_user -d invoice_crm"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+
+  # Invoice CRM API
+  api:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    container_name: invoice-crm-api
+    restart: unless-stopped
+    ports:
+      - "3000:3000"
+    environment:
+      NODE_ENV: production
+      PORT: 3000
+      HOST: 0.0.0.0
+      DATABASE_URL: postgresql://invoice_user:invoice_password@postgres:5432/invoice_crm?schema=public
+      JWT_SECRET: ${JWT_SECRET}
+      STRIPE_SECRET_KEY: ${STRIPE_SECRET_KEY}
+      STRIPE_WEBHOOK_SECRET: ${STRIPE_WEBHOOK_SECRET}
+      N8N_INVOICE_CREATED_WEBHOOK: ${N8N_INVOICE_CREATED_WEBHOOK}
+      N8N_INVOICE_OVERDUE_WEBHOOK: ${N8N_INVOICE_OVERDUE_WEBHOOK}
+      N8N_PAYMENT_RECEIVED_WEBHOOK: ${N8N_PAYMENT_RECEIVED_WEBHOOK}
+      CORS_ORIGIN: ${CORS_ORIGIN:-*}
+    depends_on:
+      postgres:
+        condition: service_healthy
+    volumes:
+      - invoice_storage:/app/storage
+    command: sh -c "npx prisma migrate deploy && node dist/server.js"
+
+  # n8n (Optional - for webhook automation)
+  n8n:
+    image: n8nio/n8n:latest
+    container_name: invoice-crm-n8n
+    restart: unless-stopped
+    ports:
+      - "5678:5678"
+    environment:
+      - N8N_BASIC_AUTH_ACTIVE=true
+      - N8N_BASIC_AUTH_USER=admin
+      - N8N_BASIC_AUTH_PASSWORD=admin123
+      - N8N_HOST=0.0.0.0
+      - N8N_PORT=5678
+      - N8N_PROTOCOL=http
+      - WEBHOOK_URL=http://n8n:5678/
+    volumes:
+      - n8n_data:/home/node/.n8n
+
+volumes:
+  postgres_data:
+    driver: local
+  invoice_storage:
+    driver: local
+  n8n_data:
+    driver: local
+
+networks:
+  default:
+    name: invoice-crm-network
+

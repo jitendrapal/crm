@@ -1,0 +1,147 @@
+// This is your Prisma schema file
+// Learn more: https://pris.ly/d/prisma-schema
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "sqlite"
+  url      = env("DATABASE_URL")
+}
+
+// Multi-tenant: Each company is a tenant
+model Tenant {
+  id        String   @id @default(uuid())
+  name      String
+  email     String   @unique
+  phone     String?
+  address   String?
+  logo      String?
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  users     User[]
+  customers Customer[]
+  invoices  Invoice[]
+  payments  Payment[]
+
+  @@map("tenants")
+}
+
+model User {
+  id        String   @id @default(uuid())
+  email     String   @unique
+  password  String
+  firstName String
+  lastName  String
+  role      String   @default("USER") // ADMIN or USER
+  tenantId  String
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  tenant Tenant @relation(fields: [tenantId], references: [id], onDelete: Cascade)
+
+  @@index([tenantId])
+  @@map("users")
+}
+
+// UserRole enum removed - using String instead for SQLite compatibility
+// Valid values: "ADMIN", "USER"
+
+model Customer {
+  id        String   @id @default(uuid())
+  name      String
+  email     String
+  phone     String?
+  address   String?
+  city      String?
+  state     String?
+  zipCode   String?
+  country   String?
+  tenantId  String
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  tenant   Tenant    @relation(fields: [tenantId], references: [id], onDelete: Cascade)
+  invoices Invoice[]
+
+  @@index([tenantId])
+  @@index([email, tenantId])
+  @@map("customers")
+}
+
+model Invoice {
+  id             String        @id @default(uuid())
+  invoiceNumber  String        @unique
+  customerId     String
+  tenantId       String
+  status         String        @default("DRAFT") // DRAFT, SENT, PAID, OVERDUE, CANCELLED
+  issueDate      DateTime      @default(now())
+  dueDate        DateTime
+  subtotal       Float         @default(0)
+  tax            Float         @default(0)
+  discount       Float         @default(0)
+  total          Float         @default(0)
+  notes          String?
+  pdfUrl         String?
+  stripeInvoiceId String?      @unique
+  createdAt      DateTime      @default(now())
+  updatedAt      DateTime      @updatedAt
+
+  tenant   Tenant         @relation(fields: [tenantId], references: [id], onDelete: Cascade)
+  customer Customer       @relation(fields: [customerId], references: [id], onDelete: Restrict)
+  items    InvoiceItem[]
+  payments Payment[]
+
+  @@index([tenantId])
+  @@index([customerId])
+  @@index([status])
+  @@index([dueDate])
+  @@map("invoices")
+}
+
+// InvoiceStatus enum removed - using String instead for SQLite compatibility
+// Valid values: "DRAFT", "SENT", "PAID", "OVERDUE", "CANCELLED"
+
+model InvoiceItem {
+  id          String   @id @default(uuid())
+  invoiceId   String
+  description String
+  quantity    Float
+  unitPrice   Float
+  amount      Float
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+
+  invoice Invoice @relation(fields: [invoiceId], references: [id], onDelete: Cascade)
+
+  @@index([invoiceId])
+  @@map("invoice_items")
+}
+
+model Payment {
+  id                String        @id @default(uuid())
+  invoiceId         String
+  tenantId          String
+  amount            Float
+  paymentMethod     String        @default("OTHER") // CREDIT_CARD, BANK_TRANSFER, CASH, CHECK, STRIPE, OTHER
+  paymentDate       DateTime      @default(now())
+  stripePaymentId   String?       @unique
+  stripeChargeId    String?
+  transactionId     String?
+  notes             String?
+  createdAt         DateTime      @default(now())
+  updatedAt         DateTime      @updatedAt
+
+  tenant  Tenant  @relation(fields: [tenantId], references: [id], onDelete: Cascade)
+  invoice Invoice @relation(fields: [invoiceId], references: [id], onDelete: Restrict)
+
+  @@index([tenantId])
+  @@index([invoiceId])
+  @@map("payments")
+}
+
+// PaymentMethod enum removed - using String instead for SQLite compatibility
+// Valid values: "CREDIT_CARD", "BANK_TRANSFER", "CASH", "CHECK", "STRIPE", "OTHER"
+

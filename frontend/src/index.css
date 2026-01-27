@@ -1,0 +1,164 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@layer base {
+  :root {
+    /* Modern Financial Color Palette */
+    --background: 0 0% 100%;
+    --foreground: 222.2 84% 4.9%;
+    --card: 0 0% 100%;
+    --card-foreground: 222.2 84% 4.9%;
+    --popover: 0 0% 100%;
+    --popover-foreground: 222.2 84% 4.9%;
+
+    /* Primary: Professional Sky Blue */
+    --primary: 199 89% 48%;
+    --primary-foreground: 0 0% 100%;
+
+    /* Secondary: Soft Gray */
+    --secondary: 210 40% 96.1%;
+    --secondary-foreground: 222.2 47.4% 11.2%;
+
+    /* Muted: Light Background */
+    --muted: 210 40% 96.1%;
+    --muted-foreground: 215.4 16.3% 46.9%;
+
+    /* Accent: Vibrant Blue */
+    --accent: 210 40% 96.1%;
+    --accent-foreground: 222.2 47.4% 11.2%;
+
+    /* Success: Emerald Green */
+    --success: 142 76% 36%;
+    --success-foreground: 0 0% 100%;
+
+    /* Warning: Amber */
+    --warning: 38 92% 50%;
+    --warning-foreground: 0 0% 100%;
+
+    /* Destructive: Red */
+    --destructive: 0 84.2% 60.2%;
+    --destructive-foreground: 0 0% 100%;
+
+    /* Info: Cyan */
+    --info: 188 94% 42%;
+    --info-foreground: 0 0% 100%;
+
+    /* Borders & Inputs */
+    --border: 214.3 31.8% 91.4%;
+    --input: 214.3 31.8% 91.4%;
+    --ring: 199 89% 48%;
+    --radius: 0.5rem;
+  }
+
+  .dark {
+    /* Premium Dark Mode */
+    --background: 222.2 47% 11%;
+    --foreground: 210 40% 98%;
+    --card: 217.2 33% 17%;
+    --card-foreground: 210 40% 98%;
+    --popover: 217.2 33% 17%;
+    --popover-foreground: 210 40% 98%;
+
+    /* Primary: Bright Blue */
+    --primary: 199 89% 48%;
+    --primary-foreground: 0 0% 100%;
+
+    /* Secondary: Dark Gray */
+    --secondary: 217.2 32.6% 17.5%;
+    --secondary-foreground: 210 40% 98%;
+
+    /* Muted: Darker Background */
+    --muted: 217.2 32.6% 17.5%;
+    --muted-foreground: 215 20.2% 65.1%;
+
+    /* Accent: Lighter Gray */
+    --accent: 217.2 32.6% 17.5%;
+    --accent-foreground: 210 40% 98%;
+
+    /* Success: Vibrant Green */
+    --success: 142 71% 45%;
+    --success-foreground: 0 0% 100%;
+
+    /* Warning: Bright Amber */
+    --warning: 38 92% 50%;
+    --warning-foreground: 0 0% 100%;
+
+    /* Destructive: Bright Red */
+    --destructive: 0 62.8% 30.6%;
+    --destructive-foreground: 210 40% 98%;
+
+    /* Info: Bright Cyan */
+    --info: 188 94% 42%;
+    --info-foreground: 0 0% 100%;
+
+    /* Borders & Inputs */
+    --border: 217.2 32.6% 17.5%;
+    --input: 217.2 32.6% 17.5%;
+    --ring: 199 89% 48%;
+  }
+}
+
+@layer base {
+  * {
+    @apply border-border;
+  }
+  body {
+    @apply bg-background text-foreground;
+    font-feature-settings:
+      'rlig' 1,
+      'calt' 1;
+  }
+}
+
+@layer utilities {
+  .scrollbar-hide::-webkit-scrollbar {
+    display: none;
+  }
+  .scrollbar-hide {
+    -ms-overflow-style: none;
+    scrollbar-width: none;
+  }
+
+  /* Gradient Backgrounds for Stat Cards */
+  .gradient-primary {
+    background: linear-gradient(135deg, hsl(var(--primary) / 0.1) 0%, transparent 100%);
+  }
+
+  .gradient-success {
+    background: linear-gradient(135deg, hsl(var(--success) / 0.1) 0%, transparent 100%);
+  }
+
+  .gradient-warning {
+    background: linear-gradient(135deg, hsl(var(--warning) / 0.1) 0%, transparent 100%);
+  }
+
+  .gradient-info {
+    background: linear-gradient(135deg, hsl(var(--info) / 0.1) 0%, transparent 100%);
+  }
+
+  /* Hover Effects */
+  .card-hover {
+    transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+  }
+
+  .card-hover:hover {
+    transform: translateY(-2px);
+    box-shadow:
+      0 10px 25px -5px rgb(0 0 0 / 0.1),
+      0 8px 10px -6px rgb(0 0 0 / 0.1);
+  }
+
+  /* Animated Gradient Border */
+  .gradient-border {
+    position: relative;
+    background: linear-gradient(135deg, hsl(var(--primary)) 0%, hsl(var(--success)) 100%);
+    padding: 2px;
+    border-radius: calc(var(--radius) + 2px);
+  }
+
+  .gradient-border > * {
+    background: hsl(var(--card));
+    border-radius: var(--radius);
+  }
+}
