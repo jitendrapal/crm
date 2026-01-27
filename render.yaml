@@ -1,0 +1,46 @@
+services:
+  # PostgreSQL Database
+  - type: pserv
+    name: invoice-crm-db
+    plan: free
+    databaseName: invoice_crm
+    user: invoice_crm_user
+
+  # Backend API
+  - type: web
+    name: invoice-crm-backend
+    runtime: node
+    plan: free
+    buildCommand: npm install && npx prisma generate && npx prisma migrate deploy
+    startCommand: npm start
+    envVars:
+      - key: NODE_ENV
+        value: production
+      - key: PORT
+        value: 3000
+      - key: DATABASE_URL
+        fromDatabase:
+          name: invoice-crm-db
+          property: connectionString
+      - key: JWT_SECRET
+        generateValue: true
+    healthCheckPath: /health
+
+  # Frontend Static Site
+  - type: web
+    name: invoice-crm-frontend
+    runtime: static
+    plan: free
+    buildCommand: cd frontend && npm install && npm run build
+    staticPublishPath: frontend/dist
+    envVars:
+      - key: VITE_API_URL
+        fromService:
+          type: web
+          name: invoice-crm-backend
+          property: host
+    routes:
+      - type: rewrite
+        source: /*
+        destination: /index.html
+
