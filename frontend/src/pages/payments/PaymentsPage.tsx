@@ -3,7 +3,6 @@ import { useQuery } from '@tanstack/react-query';
 import { Plus, CreditCard } from 'lucide-react';
 import { Header } from '@/components/layout/Header';
 import { Button } from '@/components/ui/Button';
-import { Badge } from '@/components/ui/Badge';
 import { RecordPaymentDialog } from './RecordPaymentDialog';
 import api from '@/lib/api';
 import { formatCurrency, formatDate } from '@/lib/utils';
@@ -16,12 +15,14 @@ export function PaymentsPage() {
   const { data, isLoading } = useQuery({
     queryKey: ['payments', page],
     queryFn: async () => {
-      const response = await api.get<PaginatedResponse<Payment>>(`/payments?page=${page}&limit=10`);
+      const response = await api.get<PaginatedResponse<Payment>>(
+        `/payments?page=${page}&limit=10`
+      );
       return response.data;
     },
   });
 
-  const getPaymentMethodIcon = (method: string) => {
+  const getPaymentMethodIcon = (_method: string) => {
     return <CreditCard className="h-4 w-4" />;
   };
 
@@ -44,7 +45,9 @@ export function PaymentsPage() {
             <table className="w-full">
               <thead className="border-b bg-muted/50">
                 <tr>
-                  <th className="px-6 py-3 text-left text-sm font-medium">Payment Date</th>
+                  <th className="px-6 py-3 text-left text-sm font-medium">
+                    Payment Date
+                  </th>
                   <th className="px-6 py-3 text-left text-sm font-medium">Invoice</th>
                   <th className="px-6 py-3 text-left text-sm font-medium">Customer</th>
                   <th className="px-6 py-3 text-left text-sm font-medium">Method</th>
@@ -55,13 +58,19 @@ export function PaymentsPage() {
               <tbody className="divide-y">
                 {isLoading ? (
                   <tr>
-                    <td colSpan={6} className="px-6 py-12 text-center text-muted-foreground">
+                    <td
+                      colSpan={6}
+                      className="px-6 py-12 text-center text-muted-foreground"
+                    >
                       Loading...
                     </td>
                   </tr>
                 ) : data?.data.length === 0 ? (
                   <tr>
-                    <td colSpan={6} className="px-6 py-12 text-center text-muted-foreground">
+                    <td
+                      colSpan={6}
+                      className="px-6 py-12 text-center text-muted-foreground"
+                    >
                       No payments found
                     </td>
                   </tr>
@@ -76,7 +85,9 @@ export function PaymentsPage() {
                       <td className="px-6 py-4">
                         <div className="flex items-center gap-2">
                           {getPaymentMethodIcon(payment.paymentMethod)}
-                          <span className="text-sm">{payment.paymentMethod.replace('_', ' ')}</span>
+                          <span className="text-sm">
+                            {payment.paymentMethod.replace('_', ' ')}
+                          </span>
                         </div>
                       </td>
                       <td className="px-6 py-4 font-medium text-green-600">
@@ -121,4 +132,3 @@ export function PaymentsPage() {
     </div>
   );
 }
-

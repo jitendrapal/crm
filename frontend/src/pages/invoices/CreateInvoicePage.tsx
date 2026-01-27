@@ -1,4 +1,3 @@
-import { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useQuery, useMutation } from '@tanstack/react-query';
 import { useForm, useFieldArray } from 'react-hook-form';
@@ -24,13 +23,15 @@ const invoiceSchema = z.object({
   tax: z.number().min(0, 'Tax must be positive'),
   discount: z.number().min(0, 'Discount must be positive'),
   notes: z.string().optional(),
-  items: z.array(
-    z.object({
-      description: z.string().min(1, 'Description is required'),
-      quantity: z.number().min(1, 'Quantity must be at least 1'),
-      unitPrice: z.number().min(0, 'Unit price must be positive'),
-    })
-  ).min(1, 'At least one item is required'),
+  items: z
+    .array(
+      z.object({
+        description: z.string().min(1, 'Description is required'),
+        quantity: z.number().min(1, 'Quantity must be at least 1'),
+        unitPrice: z.number().min(0, 'Unit price must be positive'),
+      })
+    )
+    .min(1, 'At least one item is required'),
 });
 
 type InvoiceForm = z.infer<typeof invoiceSchema>;
@@ -93,7 +94,10 @@ export function CreateInvoicePage() {
 
   return (
     <div className="flex flex-col h-full">
-      <Header title="Create Invoice" subtitle="Generate a new invoice for your customer" />
+      <Header
+        title="Create Invoice"
+        subtitle="Generate a new invoice for your customer"
+      />
 
       <div className="flex-1 overflow-auto p-6">
         <form onSubmit={handleSubmit(onSubmit)} className="max-w-4xl mx-auto space-y-6">
@@ -114,7 +118,9 @@ export function CreateInvoicePage() {
                     ))}
                   </Select>
                   {errors.customerId && (
-                    <p className="text-sm text-destructive">{errors.customerId.message}</p>
+                    <p className="text-sm text-destructive">
+                      {errors.customerId.message}
+                    </p>
                   )}
                 </div>
 
@@ -178,7 +184,9 @@ export function CreateInvoicePage() {
                   <div className="col-span-2 space-y-2">
                     <Label>Amount</Label>
                     <div className="h-10 flex items-center font-medium">
-                      {formatCurrency((items[index]?.quantity || 0) * (items[index]?.unitPrice || 0))}
+                      {formatCurrency(
+                        (items[index]?.quantity || 0) * (items[index]?.unitPrice || 0)
+                      )}
                     </div>
                   </div>
                   <div className="col-span-1 flex items-end">
@@ -227,7 +235,11 @@ export function CreateInvoicePage() {
 
               <div className="space-y-2">
                 <Label htmlFor="notes">Notes</Label>
-                <Textarea id="notes" placeholder="Additional notes or terms" {...register('notes')} />
+                <Textarea
+                  id="notes"
+                  placeholder="Additional notes or terms"
+                  {...register('notes')}
+                />
               </div>
 
               <div className="border-t pt-4 space-y-2">
@@ -264,4 +276,3 @@ export function CreateInvoicePage() {
     </div>
   );
 }
-

@@ -1,12 +1,5 @@
 import { useQuery } from '@tanstack/react-query';
-import {
-  FileText,
-  Users,
-  DollarSign,
-  AlertCircle,
-  TrendingUp,
-  Clock,
-} from 'lucide-react';
+import { FileText, Users, DollarSign, TrendingUp, Clock } from 'lucide-react';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/Card';
 import { Header } from '@/components/layout/Header';
 import { Badge } from '@/components/ui/Badge';
@@ -169,7 +162,7 @@ export function DashboardPage() {
                     fill="#8884d8"
                     dataKey="value"
                   >
-                    {statusData.map((entry, index) => (
+                    {statusData.map((_entry, index) => (
                       <Cell key={`cell-${index}`} fill={COLORS[index % COLORS.length]} />
                     ))}
                   </Pie>
