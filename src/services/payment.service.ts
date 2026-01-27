@@ -57,12 +57,96 @@ export class PaymentService {
     return payment;
   }
 
-  async getPayments(tenantId: string, invoiceId?: string, page = 1, limit = 10) {
+  async getPayments(
+    tenantId: string,
+    filters?: {
+      invoiceId?: string;
+      search?: string;
+      paymentMethod?: string;
+      minAmount?: number;
+      maxAmount?: number;
+      startDate?: string;
+      endDate?: string;
+      dateFilter?: 'THIS_MONTH' | 'LAST_MONTH' | 'THIS_QUARTER' | 'THIS_YEAR';
+    },
+    page = 1,
+    limit = 10
+  ) {
     const skip = (page - 1) * limit;
     const where: any = { tenantId };
 
-    if (invoiceId) {
-      where.invoiceId = invoiceId;
+    // Invoice filter
+    if (filters?.invoiceId) {
+      where.invoiceId = filters.invoiceId;
+    }
+
+    // Search by invoice number or customer name
+    if (filters?.search) {
+      where.OR = [
+        { invoice: { invoiceNumber: { contains: filters.search, mode: 'insensitive' } } },
+        {
+          invoice: {
+            customer: { name: { contains: filters.search, mode: 'insensitive' } },
+          },
+        },
+        { transactionId: { contains: filters.search, mode: 'insensitive' } },
+      ];
+    }
+
+    // Payment method filter
+    if (filters?.paymentMethod) {
+      where.paymentMethod = filters.paymentMethod;
+    }
+
+    // Amount range filter
+    if (filters?.minAmount !== undefined || filters?.maxAmount !== undefined) {
+      where.amount = {};
+      if (filters.minAmount !== undefined) {
+        where.amount.gte = filters.minAmount;
+      }
+      if (filters.maxAmount !== undefined) {
+        where.amount.lte = filters.maxAmount;
+      }
+    }
+
+    // Date range filter
+    if (filters?.startDate || filters?.endDate || filters?.dateFilter) {
+      where.paymentDate = {};
+
+      if (filters.dateFilter) {
+        const now = new Date();
+        let startDate: Date;
+        let endDate: Date = now;
+
+        switch (filters.dateFilter) {
+          case 'THIS_MONTH':
+            startDate = new Date(now.getFullYear(), now.getMonth(), 1);
+            break;
+          case 'LAST_MONTH':
+            startDate = new Date(now.getFullYear(), now.getMonth() - 1, 1);
+            endDate = new Date(now.getFullYear(), now.getMonth(), 0);
+            break;
+          case 'THIS_QUARTER':
+            const quarter = Math.floor(now.getMonth() / 3);
+            startDate = new Date(now.getFullYear(), quarter * 3, 1);
+            break;
+          case 'THIS_YEAR':
+            startDate = new Date(now.getFullYear(), 0, 1);
+            break;
+          default:
+            startDate = new Date(0);
+        }
+
+        where.paymentDate.gte = startDate;
+        where.paymentDate.lte = endDate;
+      } else {
+        if (filters.startDate) {
+          where.paymentDate.gte = new Date(filters.startDate);
+        }
+        if (filters.endDate) {
+          where.paymentDate.lte = new Date(filters.endDate);
+        }
+      }
     }
 
     const [payments, total] = await Promise.all([

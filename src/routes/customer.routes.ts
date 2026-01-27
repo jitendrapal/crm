@@ -23,9 +23,10 @@ export async function customerRoutes(fastify: FastifyInstance) {
   fastify.get('/', async (request: FastifyRequest, reply: FastifyReply) => {
     try {
       const user = request.user as JWTPayload;
-      const { page = 1, limit = 10 } = request.query as any;
+      const { page = 1, limit = 10, search, city, state, country } = request.query as any;
       const result = await customerService.getCustomers(
         user.tenantId,
+        { search, city, state, country },
         parseInt(page),
         parseInt(limit)
       );

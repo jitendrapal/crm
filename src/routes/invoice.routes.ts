@@ -26,10 +26,31 @@ export async function invoiceRoutes(fastify: FastifyInstance) {
   fastify.get('/', async (request: FastifyRequest, reply: FastifyReply) => {
     try {
       const user = request.user as JWTPayload;
-      const { page = 1, limit = 10, status, customerId } = request.query as any;
+      const {
+        page = 1,
+        limit = 10,
+        status,
+        customerId,
+        search,
+        minAmount,
+        maxAmount,
+        startDate,
+        endDate,
+        dateFilter,
+      } = request.query as any;
+
       const result = await invoiceService.getInvoices(
         user.tenantId,
-        { status, customerId },
+        {
+          status,
+          customerId,
+          search,
+          minAmount: minAmount ? parseFloat(minAmount) : undefined,
+          maxAmount: maxAmount ? parseFloat(maxAmount) : undefined,
+          startDate,
+          endDate,
+          dateFilter,
+        },
         parseInt(page),
         parseInt(limit)
       );

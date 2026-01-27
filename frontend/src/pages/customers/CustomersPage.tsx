@@ -1,10 +1,11 @@
 import { useState } from 'react';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
-import { Plus, Edit, Trash2, Mail, Phone } from 'lucide-react';
+import { Plus, Edit, Trash2, Mail, Phone, Search, X } from 'lucide-react';
 import { toast } from 'sonner';
 import { Header } from '@/components/layout/Header';
 import { Button } from '@/components/ui/Button';
 import { Card, CardContent } from '@/components/ui/Card';
+import { Input } from '@/components/ui/Input';
 import { CreateCustomerDialog } from './CreateCustomerDialog';
 import api from '@/lib/api';
 import { Customer, PaginatedResponse } from '@/types';
@@ -12,18 +13,39 @@ import { Customer, PaginatedResponse } from '@/types';
 export function CustomersPage() {
   const [isCreateOpen, setIsCreateOpen] = useState(false);
   const [page, setPage] = useState(1);
+  const [searchQuery, setSearchQuery] = useState('');
+  const [city, setCity] = useState('');
+  const [state, setState] = useState('');
+  const [country, setCountry] = useState('');
+  const [showAdvancedFilters, setShowAdvancedFilters] = useState(false);
   const queryClient = useQueryClient();
 
   const { data, isLoading, error } = useQuery({
-    queryKey: ['customers', page],
+    queryKey: ['customers', page, searchQuery, city, state, country],
     queryFn: async () => {
-      const response = await api.get<PaginatedResponse<Customer>>(
-        `/customers?page=${page}&limit=10`
-      );
+      const params = new URLSearchParams({
+        page: page.toString(),
+        limit: '10',
+        ...(searchQuery && { search: searchQuery }),
+        ...(city && { city }),
+        ...(state && { state }),
+        ...(country && { country }),
+      });
+      const response = await api.get<PaginatedResponse<Customer>>(`/customers?${params}`);
       console.log('Customers API Response:', response.data);
       return response.data;
     },
   });
+
+  const clearFilters = () => {
+    setSearchQuery('');
+    setCity('');
+    setState('');
+    setCountry('');
+    setPage(1);
+  };
+
+  const hasActiveFilters = searchQuery || city || state || country;
 
   // Log for debugging
   console.log('Customers data:', data);
@@ -61,6 +83,70 @@ export function CustomersPage() {
       />
 
       <div className="flex-1 overflow-auto p-6">
+        {/* Search and Filters */}
+        <div className="mb-6 space-y-4">
+          {/* Search Bar */}
+          <div className="flex gap-4">
+            <div className="flex-1 relative">
+              <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-muted-foreground" />
+              <Input
+                type="text"
+                placeholder="Search by name, email, or phone..."
+                value={searchQuery}
+                onChange={(e) => setSearchQuery(e.target.value)}
+                className="pl-10"
+              />
+            </div>
+            <Button
+              variant="outline"
+              onClick={() => setShowAdvancedFilters(!showAdvancedFilters)}
+            >
+              {showAdvancedFilters ? 'Hide' : 'Show'} Filters
+            </Button>
+            {hasActiveFilters && (
+              <Button variant="ghost" onClick={clearFilters}>
+                <X className="mr-2 h-4 w-4" />
+                Clear All
+              </Button>
+            )}
+          </div>
+
+          {/* Advanced Filters */}
+          {showAdvancedFilters && (
+            <div className="grid grid-cols-1 md:grid-cols-3 gap-4 p-4 bg-muted/50 rounded-lg">
+              <div>
+                <label className="text-sm font-medium mb-2 block">City</label>
+                <Input
+                  type="text"
+                  placeholder="Enter city..."
+                  value={city}
+                  onChange={(e) => setCity(e.target.value)}
+                />
+              </div>
+
+              <div>
+                <label className="text-sm font-medium mb-2 block">State</label>
+                <Input
+                  type="text"
+                  placeholder="Enter state..."
+                  value={state}
+                  onChange={(e) => setState(e.target.value)}
+                />
+              </div>
+
+              <div>
+                <label className="text-sm font-medium mb-2 block">Country</label>
+                <Input
+                  type="text"
+                  placeholder="Enter country..."
+                  value={country}
+                  onChange={(e) => setCountry(e.target.value)}
+                />
+              </div>
+            </div>
+          )}
+        </div>
+
         {isLoading ? (
           <div className="text-center py-12">Loading...</div>
         ) : error ? (

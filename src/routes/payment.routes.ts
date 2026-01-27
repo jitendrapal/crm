@@ -23,10 +23,31 @@ export async function paymentRoutes(fastify: FastifyInstance) {
   fastify.get('/', async (request: FastifyRequest, reply: FastifyReply) => {
     try {
       const user = request.user as JWTPayload;
-      const { page = 1, limit = 10, invoiceId } = request.query as any;
+      const {
+        page = 1,
+        limit = 10,
+        invoiceId,
+        search,
+        paymentMethod,
+        minAmount,
+        maxAmount,
+        startDate,
+        endDate,
+        dateFilter,
+      } = request.query as any;
+
       const result = await paymentService.getPayments(
         user.tenantId,
-        invoiceId,
+        {
+          invoiceId,
+          search,
+          paymentMethod,
+          minAmount: minAmount ? parseFloat(minAmount) : undefined,
+          maxAmount: maxAmount ? parseFloat(maxAmount) : undefined,
+          startDate,
+          endDate,
+          dateFilter,
+        },
         parseInt(page),
         parseInt(limit)
       );

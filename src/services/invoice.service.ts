@@ -64,18 +64,89 @@ export class InvoiceService {
 
   async getInvoices(
     tenantId: string,
-    filters?: { status?: string; customerId?: string },
+    filters?: {
+      status?: string;
+      customerId?: string;
+      search?: string;
+      minAmount?: number;
+      maxAmount?: number;
+      startDate?: string;
+      endDate?: string;
+      dateFilter?: 'THIS_MONTH' | 'LAST_MONTH' | 'THIS_QUARTER' | 'THIS_YEAR';
+    },
     page = 1,
     limit = 10
   ) {
     const skip = (page - 1) * limit;
     const where: any = { tenantId };
 
+    // Status filter
     if (filters?.status) {
       where.status = filters.status;
     }
+
+    // Customer filter
     if (filters?.customerId) {
       where.customerId = filters.customerId;
+    }
+
+    // Search by invoice number or customer name
+    if (filters?.search) {
+      where.OR = [
+        { invoiceNumber: { contains: filters.search, mode: 'insensitive' } },
+        { customer: { name: { contains: filters.search, mode: 'insensitive' } } },
+      ];
+    }
+
+    // Amount range filter
+    if (filters?.minAmount !== undefined || filters?.maxAmount !== undefined) {
+      where.total = {};
+      if (filters.minAmount !== undefined) {
+        where.total.gte = filters.minAmount;
+      }
+      if (filters.maxAmount !== undefined) {
+        where.total.lte = filters.maxAmount;
+      }
+    }
+
+    // Date range filter
+    if (filters?.startDate || filters?.endDate || filters?.dateFilter) {
+      where.issueDate = {};
+
+      if (filters.dateFilter) {
+        const now = new Date();
+        let startDate: Date;
+        let endDate: Date = now;
+
+        switch (filters.dateFilter) {
+          case 'THIS_MONTH':
+            startDate = new Date(now.getFullYear(), now.getMonth(), 1);
+            break;
+          case 'LAST_MONTH':
+            startDate = new Date(now.getFullYear(), now.getMonth() - 1, 1);
+            endDate = new Date(now.getFullYear(), now.getMonth(), 0);
+            break;
+          case 'THIS_QUARTER':
+            const quarter = Math.floor(now.getMonth() / 3);
+            startDate = new Date(now.getFullYear(), quarter * 3, 1);
+            break;
+          case 'THIS_YEAR':
+            startDate = new Date(now.getFullYear(), 0, 1);
+            break;
+          default:
+            startDate = new Date(0);
+        }
+
+        where.issueDate.gte = startDate;
+        where.issueDate.lte = endDate;
+      } else {
+        if (filters.startDate) {
+          where.issueDate.gte = new Date(filters.startDate);
+        }
+        if (filters.endDate) {
+          where.issueDate.lte = new Date(filters.endDate);
+        }
+      }
     }
 
     const [invoices, total] = await Promise.all([

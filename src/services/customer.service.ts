@@ -11,17 +11,48 @@ export class CustomerService {
     });
   }
 
-  async getCustomers(tenantId: string, page = 1, limit = 10) {
+  async getCustomers(
+    tenantId: string,
+    filters?: {
+      search?: string;
+      city?: string;
+      state?: string;
+      country?: string;
+    },
+    page = 1,
+    limit = 10
+  ) {
     const skip = (page - 1) * limit;
+    const where: any = { tenantId };
+
+    // Search by name, email, or phone
+    if (filters?.search) {
+      where.OR = [
+        { name: { contains: filters.search, mode: 'insensitive' } },
+        { email: { contains: filters.search, mode: 'insensitive' } },
+        { phone: { contains: filters.search, mode: 'insensitive' } },
+      ];
+    }
+
+    // Location filters
+    if (filters?.city) {
+      where.city = { contains: filters.city, mode: 'insensitive' };
+    }
+    if (filters?.state) {
+      where.state = { contains: filters.state, mode: 'insensitive' };
+    }
+    if (filters?.country) {
+      where.country = { contains: filters.country, mode: 'insensitive' };
+    }
 
     const [customers, total] = await Promise.all([
       prisma.customer.findMany({
-        where: { tenantId },
+        where,
         skip,
         take: limit,
         orderBy: { createdAt: 'desc' },
       }),
-      prisma.customer.count({ where: { tenantId } }),
+      prisma.customer.count({ where }),
     ]);
 
     return {
