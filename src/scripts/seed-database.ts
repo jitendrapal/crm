@@ -17,11 +17,7 @@ export async function seedDatabase() {
       name: 'Demo Company',
       email: 'contact@democompany.com',
       phone: '+1-555-0100',
-      address: '123 Business St, Suite 100',
-      city: 'San Francisco',
-      state: 'CA',
-      zipCode: '94105',
-      country: 'USA',
+      address: '123 Business St, Suite 100, San Francisco, CA 94105, USA',
     },
   });
 
@@ -29,11 +25,12 @@ export async function seedDatabase() {
 
   // Create demo admin user
   const hashedPassword = await bcrypt.hash('Demo123!', 10);
-  const adminUser = await prisma.user.create({
+  await prisma.user.create({
     data: {
       email: 'admin@demo.com',
       password: hashedPassword,
-      name: 'Admin User',
+      firstName: 'Admin',
+      lastName: 'User',
       role: 'ADMIN',
       tenantId: tenant.id,
     },
