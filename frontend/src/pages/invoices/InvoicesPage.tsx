@@ -15,7 +15,7 @@ export function InvoicesPage() {
   const [page, setPage] = useState(1);
   const [statusFilter, setStatusFilter] = useState<InvoiceStatus | 'ALL'>('ALL');
 
-  const { data, isLoading } = useQuery({
+  const { data, isLoading, error } = useQuery({
     queryKey: ['invoices', page, statusFilter],
     queryFn: async () => {
       const params = new URLSearchParams({
@@ -24,6 +24,7 @@ export function InvoicesPage() {
         ...(statusFilter !== 'ALL' && { status: statusFilter }),
       });
       const response = await api.get<PaginatedResponse<Invoice>>(`/invoices?${params}`);
+      console.log('Invoices API Response:', response.data);
       return response.data;
     },
   });
@@ -88,18 +89,30 @@ export function InvoicesPage() {
               <tbody className="divide-y">
                 {isLoading ? (
                   <tr>
-                    <td colSpan={7} className="px-6 py-12 text-center text-muted-foreground">
+                    <td
+                      colSpan={7}
+                      className="px-6 py-12 text-center text-muted-foreground"
+                    >
                       Loading...
                     </td>
                   </tr>
-                ) : data?.data.length === 0 ? (
+                ) : error ? (
                   <tr>
-                    <td colSpan={7} className="px-6 py-12 text-center text-muted-foreground">
+                    <td colSpan={7} className="px-6 py-12 text-center text-red-500">
+                      Error loading invoices: {(error as any)?.message || 'Unknown error'}
+                    </td>
+                  </tr>
+                ) : !data?.data || data.data.length === 0 ? (
+                  <tr>
+                    <td
+                      colSpan={7}
+                      className="px-6 py-12 text-center text-muted-foreground"
+                    >
                       No invoices found
                     </td>
                   </tr>
                 ) : (
-                  data?.data.map((invoice) => (
+                  data.data.map((invoice) => (
                     <tr key={invoice.id} className="hover:bg-muted/50">
                       <td className="px-6 py-4 font-medium">{invoice.invoiceNumber}</td>
                       <td className="px-6 py-4">{invoice.customer?.name}</td>
@@ -109,9 +122,13 @@ export function InvoicesPage() {
                       <td className="px-6 py-4 text-sm text-muted-foreground">
                         {formatDate(invoice.dueDate)}
                       </td>
-                      <td className="px-6 py-4 font-medium">{formatCurrency(invoice.total)}</td>
+                      <td className="px-6 py-4 font-medium">
+                        {formatCurrency(invoice.total)}
+                      </td>
                       <td className="px-6 py-4">
-                        <Badge variant={getStatusVariant(invoice.status)}>{invoice.status}</Badge>
+                        <Badge variant={getStatusVariant(invoice.status)}>
+                          {invoice.status}
+                        </Badge>
                       </td>
                       <td className="px-6 py-4">
                         <div className="flex justify-end gap-2">
@@ -166,4 +183,3 @@ export function InvoicesPage() {
     </div>
   );
 }
-

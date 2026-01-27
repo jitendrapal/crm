@@ -12,12 +12,13 @@ export function PaymentsPage() {
   const [isRecordOpen, setIsRecordOpen] = useState(false);
   const [page, setPage] = useState(1);
 
-  const { data, isLoading } = useQuery({
+  const { data, isLoading, error } = useQuery({
     queryKey: ['payments', page],
     queryFn: async () => {
       const response = await api.get<PaginatedResponse<Payment>>(
         `/payments?page=${page}&limit=10`
       );
+      console.log('Payments API Response:', response.data);
       return response.data;
     },
   });
@@ -65,7 +66,13 @@ export function PaymentsPage() {
                       Loading...
                     </td>
                   </tr>
-                ) : data?.data.length === 0 ? (
+                ) : error ? (
+                  <tr>
+                    <td colSpan={6} className="px-6 py-12 text-center text-red-500">
+                      Error loading payments: {(error as any)?.message || 'Unknown error'}
+                    </td>
+                  </tr>
+                ) : !data?.data || data.data.length === 0 ? (
                   <tr>
                     <td
                       colSpan={6}
@@ -75,7 +82,7 @@ export function PaymentsPage() {
                     </td>
                   </tr>
                 ) : (
-                  data?.data.map((payment) => (
+                  data.data.map((payment) => (
                     <tr key={payment.id} className="hover:bg-muted/50">
                       <td className="px-6 py-4">{formatDate(payment.paymentDate)}</td>
                       <td className="px-6 py-4 font-medium">
