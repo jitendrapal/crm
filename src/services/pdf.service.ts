@@ -74,11 +74,13 @@ export class PDFService {
       // Table Header
       const tableTop = 280;
       doc
+        .font('Helvetica-Bold')
         .fontSize(10)
-        .text('Description', 50, tableTop, { bold: true })
+        .text('Description', 50, tableTop)
         .text('Qty', 300, tableTop)
         .text('Unit Price', 370, tableTop)
-        .text('Amount', 470, tableTop, { align: 'right' });
+        .text('Amount', 470, tableTop, { align: 'right' })
+        .font('Helvetica');
 
       doc
         .moveTo(50, tableTop + 15)
@@ -100,10 +102,7 @@ export class PDFService {
 
       // Totals
       yPosition += 20;
-      doc
-        .moveTo(50, yPosition)
-        .lineTo(550, yPosition)
-        .stroke();
+      doc.moveTo(50, yPosition).lineTo(550, yPosition).stroke();
 
       yPosition += 15;
       doc
@@ -123,12 +122,13 @@ export class PDFService {
 
       yPosition += 20;
       doc
+        .font('Helvetica-Bold')
         .fontSize(12)
-        .text('Total:', 370, yPosition, { bold: true })
+        .text('Total:', 370, yPosition)
         .text(`$${invoice.total.toFixed(2)}`, 470, yPosition, {
           align: 'right',
-          bold: true,
-        });
+        })
+        .font('Helvetica');
 
       // Notes
       if (invoice.notes) {
@@ -143,12 +143,9 @@ export class PDFService {
       // Footer
       doc
         .fontSize(8)
-        .text(
-          'Thank you for your business!',
-          50,
-          doc.page.height - 50,
-          { align: 'center' }
-        );
+        .text('Thank you for your business!', 50, doc.page.height - 50, {
+          align: 'center',
+        });
 
       doc.end();
     });
@@ -156,4 +153,3 @@ export class PDFService {
 }
 
 export const pdfService = new PDFService();
-

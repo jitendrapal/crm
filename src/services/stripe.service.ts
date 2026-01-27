@@ -112,7 +112,7 @@ export class StripeService {
       invoiceId: invoice.id,
       amount: stripeInvoice.amount_paid / 100, // Convert from cents
       paymentMethod: 'STRIPE',
-      stripePaymentId: stripeInvoice.payment_intent as string,
+      transactionId: stripeInvoice.payment_intent as string,
     });
   }
 
@@ -136,4 +136,3 @@ export class StripeService {
 }
 
 export const stripeService = new StripeService();
-

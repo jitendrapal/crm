@@ -41,7 +41,7 @@ async function buildServer() {
   await fastify.register(multipart);
 
   // Health check
-  fastify.get('/health', async (request, reply) => {
+  fastify.get('/health', async (_request, _reply) => {
     return {
       status: 'ok',
       timestamp: new Date().toISOString(),
@@ -58,7 +58,7 @@ async function buildServer() {
   await fastify.register(webhookRoutes, { prefix: '/api/webhooks' });
 
   // Error handler
-  fastify.setErrorHandler((error, request, reply) => {
+  fastify.setErrorHandler((error, _request, reply) => {
     fastify.log.error(error);
 
     const statusCode = error.statusCode || 500;
@@ -74,7 +74,7 @@ async function buildServer() {
   });
 
   // 404 handler
-  fastify.setNotFoundHandler((request, reply) => {
+  fastify.setNotFoundHandler((_request, reply) => {
     reply.status(404).send({
       error: 'Route not found',
       statusCode: 404,

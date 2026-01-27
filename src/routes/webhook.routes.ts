@@ -35,8 +35,7 @@ export async function webhookRoutes(fastify: FastifyInstance) {
   );
 
   // Health check for webhooks
-  fastify.get('/health', async (request, reply) => {
+  fastify.get('/health', async (_request, reply) => {
     reply.send({ status: 'ok', timestamp: new Date().toISOString() });
   });
 }
-

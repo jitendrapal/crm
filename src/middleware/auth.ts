@@ -1,38 +1,36 @@
 import { FastifyRequest, FastifyReply } from 'fastify';
 
-export interface AuthenticatedRequest extends FastifyRequest {
-  user?: {
-    userId: string;
-    tenantId: string;
-    email: string;
-    role: string;
-  };
+// Extend the FastifyRequest interface for JWT
+declare module 'fastify' {
+  interface FastifyRequest {
+    user?: {
+      userId: string;
+      tenantId: string;
+      email: string;
+      role: string;
+    };
+  }
 }
 
-export async function authenticate(
-  request: AuthenticatedRequest,
-  reply: FastifyReply
-) {
+export type AuthenticatedRequest = FastifyRequest;
+
+export async function authenticate(request: FastifyRequest, reply: FastifyReply) {
   try {
     await request.jwtVerify();
     // The decoded JWT payload is automatically attached to request.user by @fastify/jwt
-  } catch (err) {
+  } catch (_err) {
     reply.status(401).send({ error: 'Unauthorized' });
   }
 }
 
-export async function requireAdmin(
-  request: AuthenticatedRequest,
-  reply: FastifyReply
-) {
+export async function requireAdmin(request: FastifyRequest, reply: FastifyReply) {
   try {
     await request.jwtVerify();
-    
+
     if (request.user?.role !== 'ADMIN') {
       return reply.status(403).send({ error: 'Forbidden: Admin access required' });
     }
-  } catch (err) {
+  } catch (_err) {
     reply.status(401).send({ error: 'Unauthorized' });
   }
 }
-
