@@ -16,8 +16,8 @@ export const config = {
   jwtExpiresIn: process.env.JWT_EXPIRES_IN || '7d',
 
   // Stripe
-  stripeSecretKey: process.env.STRIPE_SECRET_KEY!,
-  stripeWebhookSecret: process.env.STRIPE_WEBHOOK_SECRET!,
+  stripeSecretKey: process.env.STRIPE_SECRET_KEY || '',
+  stripeWebhookSecret: process.env.STRIPE_WEBHOOK_SECRET || '',
 
   // n8n Webhooks
   n8nWebhookUrl: process.env.N8N_WEBHOOK_URL || '',
@@ -45,4 +45,3 @@ for (const envVar of requiredEnvVars) {
     throw new Error(`Missing required environment variable: ${envVar}`);
   }
 }
-
