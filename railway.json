@@ -4,7 +4,7 @@
     "buildCommand": "npm install && npx prisma generate && npm run build"
   },
   "deploy": {
-    "startCommand": "npx prisma migrate resolve --rolled-back 20260127173658_init || true && npx prisma migrate deploy && npm start",
+    "startCommand": "npx prisma db push --accept-data-loss && npx prisma generate && npm start",
     "restartPolicyType": "ON_FAILURE",
     "restartPolicyMaxRetries": 10
   }
