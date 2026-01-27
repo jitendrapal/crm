@@ -1,0 +1,5 @@
+# Tell Railway to ignore Dockerfile and use Nixpacks instead
+Dockerfile
+docker-compose.yml
+.dockerignore
+
