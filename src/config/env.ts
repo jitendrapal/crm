@@ -35,6 +35,11 @@ export const config = {
   // PDF
   pdfStoragePath: process.env.PDF_STORAGE_PATH || './storage/invoices',
   companyLogoUrl: process.env.COMPANY_LOGO_URL || '',
+
+  // Email (Resend)
+  resendApiKey: process.env.RESEND_API_KEY || '',
+  fromEmail: process.env.FROM_EMAIL || 'onboarding@resend.dev',
+  companyName: process.env.COMPANY_NAME || 'Invoice CRM',
 };
 
 // Validate required environment variables
