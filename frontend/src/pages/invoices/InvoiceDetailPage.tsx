@@ -17,8 +17,8 @@ export function InvoiceDetailPage() {
   const { data: invoice } = useQuery({
     queryKey: ['invoice', id],
     queryFn: async () => {
-      const response = await api.get<Invoice>(`/invoices/${id}`);
-      return response.data;
+      const response = await api.get<{ invoice: Invoice }>(`/invoices/${id}`);
+      return response.data.invoice;
     },
   });
 
@@ -151,7 +151,7 @@ export function InvoiceDetailPage() {
                   </tr>
                 </thead>
                 <tbody className="divide-y">
-                  {invoice.items.map((item) => (
+                  {invoice.items?.map((item) => (
                     <tr key={item.id}>
                       <td className="py-3">{item.description}</td>
                       <td className="text-right py-3">{item.quantity}</td>
@@ -162,7 +162,13 @@ export function InvoiceDetailPage() {
                         {formatCurrency(item.amount)}
                       </td>
                     </tr>
-                  ))}
+                  )) || (
+                    <tr>
+                      <td colSpan={4} className="text-center py-4 text-muted-foreground">
+                        No items found
+                      </td>
+                    </tr>
+                  )}
                 </tbody>
               </table>
 
