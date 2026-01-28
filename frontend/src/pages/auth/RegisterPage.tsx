@@ -8,6 +8,7 @@ import { FileText } from 'lucide-react';
 import { Button } from '@/components/ui/Button';
 import { Input } from '@/components/ui/Input';
 import { Label } from '@/components/ui/Label';
+import { PasswordStrength } from '@/components/ui/PasswordStrength';
 import {
   Card,
   CardContent,
@@ -40,10 +41,13 @@ export function RegisterPage() {
   const {
     register,
     handleSubmit,
+    watch,
     formState: { errors },
   } = useForm<RegisterForm>({
     resolver: zodResolver(registerSchema),
   });
+
+  const password = watch('password');
 
   const onSubmit = async (data: RegisterForm) => {
     setIsLoading(true);
@@ -115,6 +119,7 @@ export function RegisterPage() {
               {errors.password && (
                 <p className="text-sm text-destructive">{errors.password.message}</p>
               )}
+              <PasswordStrength password={password || ''} />
             </div>
 
             <div className="border-t pt-4">
