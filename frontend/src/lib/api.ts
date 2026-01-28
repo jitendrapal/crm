@@ -1,9 +1,17 @@
 import axios from 'axios';
 
 // Use environment variable for API URL in production, fallback to /api for development
-const baseURL = import.meta.env.VITE_API_URL
-  ? `${import.meta.env.VITE_API_URL}/api`
-  : '/api';
+const getBaseURL = () => {
+  if (import.meta.env.VITE_API_URL) {
+    const apiUrl = import.meta.env.VITE_API_URL;
+    // Ensure the URL has the correct protocol
+    const url = apiUrl.startsWith('http') ? apiUrl : `https://${apiUrl}`;
+    return `${url}/api`;
+  }
+  return '/api';
+};
+
+const baseURL = getBaseURL();
 
 const api = axios.create({
   baseURL,
