@@ -1,7 +1,5 @@
 import { Resend } from 'resend';
 import { config } from '../config/env';
-import fs from 'fs';
-import path from 'path';
 
 export class EmailService {
   private resend: Resend;

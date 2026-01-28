@@ -120,9 +120,9 @@ export async function invoiceRoutes(fastify: FastifyInstance) {
         return reply.code(400).send({ error: 'Tenant information not found' });
       }
 
-      // Generate PDF
+      // Generate PDF as Buffer for email attachment
       const invoiceWithTenant = { ...invoice, tenant };
-      const pdfBuffer = await pdfService.generateInvoicePDF(invoiceWithTenant);
+      const pdfBuffer = await pdfService.generateInvoicePDFBuffer(invoiceWithTenant);
 
       // Send email with PDF attachment
       const emailResult = await emailService.sendInvoice(
