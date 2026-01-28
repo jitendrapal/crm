@@ -8,7 +8,13 @@ import { FileText } from 'lucide-react';
 import { Button } from '@/components/ui/Button';
 import { Input } from '@/components/ui/Input';
 import { Label } from '@/components/ui/Label';
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/Card';
+import {
+  Card,
+  CardContent,
+  CardDescription,
+  CardHeader,
+  CardTitle,
+} from '@/components/ui/Card';
 import { useAuthStore } from '@/store/auth';
 import api from '@/lib/api';
 import { AuthResponse } from '@/types';
@@ -20,6 +26,8 @@ const registerSchema = z.object({
   password: z.string().min(6, 'Password must be at least 6 characters'),
   companyName: z.string().min(2, 'Company name must be at least 2 characters'),
   companyEmail: z.string().email('Invalid email address'),
+  companyPhone: z.string().optional(),
+  companyAddress: z.string().optional(),
 });
 
 type RegisterForm = z.infer<typeof registerSchema>;
@@ -111,7 +119,7 @@ export function RegisterPage() {
 
             <div className="border-t pt-4">
               <h3 className="text-sm font-medium mb-3">Company Information</h3>
-              
+
               <div className="space-y-4">
                 <div className="space-y-2">
                   <Label htmlFor="companyName">Company Name</Label>
@@ -121,7 +129,9 @@ export function RegisterPage() {
                     {...register('companyName')}
                   />
                   {errors.companyName && (
-                    <p className="text-sm text-destructive">{errors.companyName.message}</p>
+                    <p className="text-sm text-destructive">
+                      {errors.companyName.message}
+                    </p>
                   )}
                 </div>
 
@@ -134,7 +144,38 @@ export function RegisterPage() {
                     {...register('companyEmail')}
                   />
                   {errors.companyEmail && (
-                    <p className="text-sm text-destructive">{errors.companyEmail.message}</p>
+                    <p className="text-sm text-destructive">
+                      {errors.companyEmail.message}
+                    </p>
+                  )}
+                </div>
+
+                <div className="space-y-2">
+                  <Label htmlFor="companyPhone">Company Phone (Optional)</Label>
+                  <Input
+                    id="companyPhone"
+                    type="tel"
+                    placeholder="+1 (555) 000-0000"
+                    {...register('companyPhone')}
+                  />
+                  {errors.companyPhone && (
+                    <p className="text-sm text-destructive">
+                      {errors.companyPhone.message}
+                    </p>
+                  )}
+                </div>
+
+                <div className="space-y-2">
+                  <Label htmlFor="companyAddress">Company Address (Optional)</Label>
+                  <Input
+                    id="companyAddress"
+                    placeholder="123 Business St, City, State 12345"
+                    {...register('companyAddress')}
+                  />
+                  {errors.companyAddress && (
+                    <p className="text-sm text-destructive">
+                      {errors.companyAddress.message}
+                    </p>
                   )}
                 </div>
               </div>
@@ -156,4 +197,3 @@ export function RegisterPage() {
     </div>
   );
 }
-
