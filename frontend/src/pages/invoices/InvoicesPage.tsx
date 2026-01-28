@@ -1,7 +1,8 @@
 import { useState } from 'react';
-import { useQuery } from '@tanstack/react-query';
+import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { useNavigate } from 'react-router-dom';
 import { Plus, Eye, Download, Send, Search, X } from 'lucide-react';
+import { toast } from 'sonner';
 import { Header } from '@/components/layout/Header';
 import { Button } from '@/components/ui/Button';
 import { Badge } from '@/components/ui/Badge';
@@ -14,6 +15,7 @@ import { Invoice, InvoiceStatus, PaginatedResponse } from '@/types';
 
 export function InvoicesPage() {
   const navigate = useNavigate();
+  const queryClient = useQueryClient();
   const [page, setPage] = useState(1);
   const [statusFilter, setStatusFilter] = useState<InvoiceStatus | 'ALL'>('ALL');
   const [searchQuery, setSearchQuery] = useState('');
@@ -72,6 +74,37 @@ export function InvoicesPage() {
         return 'secondary';
     }
   };
+
+  // Download PDF handler
+  const handleDownloadPDF = async (invoice: Invoice) => {
+    try {
+      const response = await api.get(`/invoices/${invoice.id}/pdf`, {
+        responseType: 'blob',
+      });
+      const url = window.URL.createObjectURL(new Blob([response.data]));
+      const link = document.createElement('a');
+      link.href = url;
+      link.setAttribute('download', `${invoice.invoiceNumber}.pdf`);
+      document.body.appendChild(link);
+      link.click();
+      link.remove();
+      toast.success('PDF downloaded successfully');
+    } catch (error) {
+      toast.error('Failed to download PDF');
+    }
+  };
+
+  // Send invoice mutation
+  const sendInvoiceMutation = useMutation({
+    mutationFn: (invoiceId: string) => api.post(`/invoices/${invoiceId}/send`),
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ['invoices'] });
+      toast.success('Invoice sent successfully');
+    },
+    onError: (error: any) => {
+      toast.error(error.response?.data?.message || 'Failed to send invoice');
+    },
+  });
 
   return (
     <div className="flex flex-col h-full">
@@ -212,23 +245,20 @@ export function InvoicesPage() {
             {
               header: 'Actions',
               accessor: (invoice) => (
-                <div className="flex justify-end gap-2">
+                <div className="flex justify-end gap-1 md:gap-2">
                   <Button
                     variant="ghost"
                     size="icon"
-                    onClick={(e) => {
-                      e.stopPropagation();
-                      navigate(`/invoices/${invoice.id}`);
-                    }}
-                    title="View"
+                    onClick={() => navigate(`/invoices/${invoice.id}`)}
+                    title="View Invoice"
                   >
                     <Eye className="h-4 w-4" />
                   </Button>
                   <Button
                     variant="ghost"
                     size="icon"
-                    onClick={(e) => e.stopPropagation()}
-                    title="Download"
+                    onClick={() => handleDownloadPDF(invoice)}
+                    title="Download PDF"
                   >
                     <Download className="h-4 w-4" />
                   </Button>
@@ -236,8 +266,9 @@ export function InvoicesPage() {
                     <Button
                       variant="ghost"
                       size="icon"
-                      onClick={(e) => e.stopPropagation()}
-                      title="Send"
+                      onClick={() => sendInvoiceMutation.mutate(invoice.id)}
+                      title="Send Invoice"
+                      disabled={sendInvoiceMutation.isPending}
                     >
                       <Send className="h-4 w-4" />
                     </Button>
