@@ -100,7 +100,62 @@ export class AuthService {
     const { password: _, ...userWithoutPassword } = user;
     return userWithoutPassword;
   }
+
+  async changePassword(userId: string, currentPassword: string, newPassword: string) {
+    // Get user with password
+    const user = await prisma.user.findUnique({
+      where: { id: userId },
+    });
+
+    if (!user) {
+      throw new Error('User not found');
+    }
+
+    // Verify current password
+    const isValidPassword = await comparePassword(currentPassword, user.password);
+
+    if (!isValidPassword) {
+      throw new Error('Current password is incorrect');
+    }
+
+    // Hash new password
+    const hashedPassword = await hashPassword(newPassword);
+
+    // Update password
+    await prisma.user.update({
+      where: { id: userId },
+      data: { password: hashedPassword },
+    });
+
+    return { message: 'Password changed successfully' };
+  }
+
+  async updateUser(
+    userId: string,
+    data: { firstName?: string; lastName?: string; email?: string }
+  ) {
+    // Check if email is being changed and if it's already taken
+    if (data.email) {
+      const existingUser = await prisma.user.findFirst({
+        where: {
+          email: data.email,
+          id: { not: userId },
+        },
+      });
+
+      if (existingUser) {
+        throw new Error('Email already in use');
+      }
+    }
+
+    const user = await prisma.user.update({
+      where: { id: userId },
+      data,
+    });
+
+    const { password: _, ...userWithoutPassword } = user;
+    return userWithoutPassword;
+  }
 }
 
 export const authService = new AuthService();
-

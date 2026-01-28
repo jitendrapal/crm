@@ -12,6 +12,8 @@ import { paymentRoutes } from './routes/payment.routes';
 import { webhookRoutes } from './routes/webhook.routes';
 import { dashboardRoutes } from './routes/dashboard.routes';
 import { seedRoutes } from './routes/seed.routes';
+import { userRoutes } from './routes/user.routes';
+import { tenantRoutes } from './routes/tenant.routes';
 
 const fastify = Fastify({
   logger: {
@@ -57,6 +59,8 @@ async function buildServer() {
   await fastify.register(invoiceRoutes, { prefix: '/api/invoices' });
   await fastify.register(paymentRoutes, { prefix: '/api/payments' });
   await fastify.register(webhookRoutes, { prefix: '/api/webhooks' });
+  await fastify.register(userRoutes, { prefix: '/api/users' });
+  await fastify.register(tenantRoutes, { prefix: '/api/tenants' });
   await fastify.register(seedRoutes, { prefix: '/api' });
 
   // Error handler

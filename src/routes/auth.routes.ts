@@ -2,6 +2,12 @@ import { FastifyInstance, FastifyRequest, FastifyReply } from 'fastify';
 import { authService } from '../services/auth.service';
 import { registerSchema, loginSchema } from '../schemas/auth.schema';
 import { authenticate, JWTPayload } from '../middleware/auth';
+import { z } from 'zod';
+
+const changePasswordSchema = z.object({
+  currentPassword: z.string(),
+  newPassword: z.string().min(6),
+});
 
 export async function authRoutes(fastify: FastifyInstance) {
   // Register
@@ -62,6 +68,26 @@ export async function authRoutes(fastify: FastifyInstance) {
         reply.send({ user: userData });
       } catch (error: any) {
         reply.code(404).send({ error: error.message });
+      }
+    }
+  );
+
+  // Change password
+  fastify.put(
+    '/change-password',
+    { onRequest: [authenticate] },
+    async (request: FastifyRequest, reply: FastifyReply) => {
+      try {
+        const user = request.user as JWTPayload;
+        const data = changePasswordSchema.parse(request.body);
+        await authService.changePassword(
+          user.userId,
+          data.currentPassword,
+          data.newPassword
+        );
+        reply.send({ message: 'Password changed successfully' });
+      } catch (error: any) {
+        reply.code(400).send({ error: error.message });
       }
     }
   );
