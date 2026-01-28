@@ -7,6 +7,7 @@ import { Button } from '@/components/ui/Button';
 import { Badge } from '@/components/ui/Badge';
 import { Select } from '@/components/ui/Select';
 import { Input } from '@/components/ui/Input';
+import { ResponsiveTable } from '@/components/ui/ResponsiveTable';
 import api from '@/lib/api';
 import { formatCurrency, formatDate } from '@/lib/utils';
 import { Invoice, InvoiceStatus, PaginatedResponse } from '@/types';
@@ -172,90 +173,86 @@ export function InvoicesPage() {
         </div>
 
         {/* Table */}
-        <div className="bg-card rounded-lg border">
-          <div className="overflow-x-auto">
-            <table className="w-full">
-              <thead className="border-b bg-muted/50">
-                <tr>
-                  <th className="px-6 py-3 text-left text-sm font-medium">Invoice #</th>
-                  <th className="px-6 py-3 text-left text-sm font-medium">Customer</th>
-                  <th className="px-6 py-3 text-left text-sm font-medium">Issue Date</th>
-                  <th className="px-6 py-3 text-left text-sm font-medium">Due Date</th>
-                  <th className="px-6 py-3 text-left text-sm font-medium">Amount</th>
-                  <th className="px-6 py-3 text-left text-sm font-medium">Status</th>
-                  <th className="px-6 py-3 text-right text-sm font-medium">Actions</th>
-                </tr>
-              </thead>
-              <tbody className="divide-y">
-                {isLoading ? (
-                  <tr>
-                    <td
-                      colSpan={7}
-                      className="px-6 py-12 text-center text-muted-foreground"
+        <ResponsiveTable
+          data={data?.data || []}
+          columns={[
+            {
+              header: 'Invoice #',
+              accessor: 'invoiceNumber',
+              className: 'font-medium',
+              mobileLabel: 'Invoice',
+            },
+            {
+              header: 'Customer',
+              accessor: (invoice) => invoice.customer?.name || 'N/A',
+            },
+            {
+              header: 'Issue Date',
+              accessor: (invoice) => formatDate(invoice.issueDate),
+              className: 'text-sm text-muted-foreground',
+              mobileLabel: 'Issued',
+            },
+            {
+              header: 'Due Date',
+              accessor: (invoice) => formatDate(invoice.dueDate),
+              className: 'text-sm text-muted-foreground',
+              mobileLabel: 'Due',
+            },
+            {
+              header: 'Amount',
+              accessor: (invoice) => formatCurrency(invoice.total),
+              className: 'font-medium',
+            },
+            {
+              header: 'Status',
+              accessor: (invoice) => (
+                <Badge variant={getStatusVariant(invoice.status)}>{invoice.status}</Badge>
+              ),
+            },
+            {
+              header: 'Actions',
+              accessor: (invoice) => (
+                <div className="flex justify-end gap-2">
+                  <Button
+                    variant="ghost"
+                    size="icon"
+                    onClick={(e) => {
+                      e.stopPropagation();
+                      navigate(`/invoices/${invoice.id}`);
+                    }}
+                    title="View"
+                  >
+                    <Eye className="h-4 w-4" />
+                  </Button>
+                  <Button
+                    variant="ghost"
+                    size="icon"
+                    onClick={(e) => e.stopPropagation()}
+                    title="Download"
+                  >
+                    <Download className="h-4 w-4" />
+                  </Button>
+                  {invoice.status === 'DRAFT' && (
+                    <Button
+                      variant="ghost"
+                      size="icon"
+                      onClick={(e) => e.stopPropagation()}
+                      title="Send"
                     >
-                      Loading...
-                    </td>
-                  </tr>
-                ) : error ? (
-                  <tr>
-                    <td colSpan={7} className="px-6 py-12 text-center text-red-500">
-                      Error loading invoices: {(error as any)?.message || 'Unknown error'}
-                    </td>
-                  </tr>
-                ) : !data?.data || data.data.length === 0 ? (
-                  <tr>
-                    <td
-                      colSpan={7}
-                      className="px-6 py-12 text-center text-muted-foreground"
-                    >
-                      No invoices found
-                    </td>
-                  </tr>
-                ) : (
-                  data.data.map((invoice) => (
-                    <tr key={invoice.id} className="hover:bg-muted/50">
-                      <td className="px-6 py-4 font-medium">{invoice.invoiceNumber}</td>
-                      <td className="px-6 py-4">{invoice.customer?.name}</td>
-                      <td className="px-6 py-4 text-sm text-muted-foreground">
-                        {formatDate(invoice.issueDate)}
-                      </td>
-                      <td className="px-6 py-4 text-sm text-muted-foreground">
-                        {formatDate(invoice.dueDate)}
-                      </td>
-                      <td className="px-6 py-4 font-medium">
-                        {formatCurrency(invoice.total)}
-                      </td>
-                      <td className="px-6 py-4">
-                        <Badge variant={getStatusVariant(invoice.status)}>
-                          {invoice.status}
-                        </Badge>
-                      </td>
-                      <td className="px-6 py-4">
-                        <div className="flex justify-end gap-2">
-                          <Button
-                            variant="ghost"
-                            size="icon"
-                            onClick={() => navigate(`/invoices/${invoice.id}`)}
-                          >
-                            <Eye className="h-4 w-4" />
-                          </Button>
-                          <Button variant="ghost" size="icon">
-                            <Download className="h-4 w-4" />
-                          </Button>
-                          {invoice.status === 'DRAFT' && (
-                            <Button variant="ghost" size="icon">
-                              <Send className="h-4 w-4" />
-                            </Button>
-                          )}
-                        </div>
-                      </td>
-                    </tr>
-                  ))
-                )}
-              </tbody>
-            </table>
-          </div>
-        </div>
+                      <Send className="h-4 w-4" />
+                    </Button>
+                  )}
+                </div>
+              ),
+              className: 'text-right',
+              hideOnMobile: false,
+            },
+          ]}
+          keyExtractor={(invoice) => invoice.id}
+          isLoading={isLoading}
+          error={error as Error}
+          emptyMessage="No invoices found"
+        />
 
         {/* Pagination */}
         {data && data.totalPages > 1 && (

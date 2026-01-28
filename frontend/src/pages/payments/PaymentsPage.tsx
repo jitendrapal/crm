@@ -5,6 +5,7 @@ import { Header } from '@/components/layout/Header';
 import { Button } from '@/components/ui/Button';
 import { Input } from '@/components/ui/Input';
 import { Select } from '@/components/ui/Select';
+import { ResponsiveTable } from '@/components/ui/ResponsiveTable';
 import { RecordPaymentDialog } from './RecordPaymentDialog';
 import api from '@/lib/api';
 import { formatCurrency, formatDate } from '@/lib/utils';
@@ -159,75 +160,51 @@ export function PaymentsPage() {
           )}
         </div>
 
-        <div className="bg-card rounded-lg border">
-          <div className="overflow-x-auto">
-            <table className="w-full">
-              <thead className="border-b bg-muted/50">
-                <tr>
-                  <th className="px-6 py-3 text-left text-sm font-medium">
-                    Payment Date
-                  </th>
-                  <th className="px-6 py-3 text-left text-sm font-medium">Invoice</th>
-                  <th className="px-6 py-3 text-left text-sm font-medium">Customer</th>
-                  <th className="px-6 py-3 text-left text-sm font-medium">Method</th>
-                  <th className="px-6 py-3 text-left text-sm font-medium">Amount</th>
-                  <th className="px-6 py-3 text-left text-sm font-medium">Reference</th>
-                </tr>
-              </thead>
-              <tbody className="divide-y">
-                {isLoading ? (
-                  <tr>
-                    <td
-                      colSpan={6}
-                      className="px-6 py-12 text-center text-muted-foreground"
-                    >
-                      Loading...
-                    </td>
-                  </tr>
-                ) : error ? (
-                  <tr>
-                    <td colSpan={6} className="px-6 py-12 text-center text-red-500">
-                      Error loading payments: {(error as any)?.message || 'Unknown error'}
-                    </td>
-                  </tr>
-                ) : !data?.data || data.data.length === 0 ? (
-                  <tr>
-                    <td
-                      colSpan={6}
-                      className="px-6 py-12 text-center text-muted-foreground"
-                    >
-                      No payments found
-                    </td>
-                  </tr>
-                ) : (
-                  data.data.map((payment) => (
-                    <tr key={payment.id} className="hover:bg-muted/50">
-                      <td className="px-6 py-4">{formatDate(payment.paymentDate)}</td>
-                      <td className="px-6 py-4 font-medium">
-                        {payment.invoice?.invoiceNumber}
-                      </td>
-                      <td className="px-6 py-4">{payment.invoice?.customer?.name}</td>
-                      <td className="px-6 py-4">
-                        <div className="flex items-center gap-2">
-                          {getPaymentMethodIcon(payment.paymentMethod)}
-                          <span className="text-sm">
-                            {payment.paymentMethod.replace('_', ' ')}
-                          </span>
-                        </div>
-                      </td>
-                      <td className="px-6 py-4 font-medium text-green-600">
-                        {formatCurrency(payment.amount)}
-                      </td>
-                      <td className="px-6 py-4 text-sm text-muted-foreground">
-                        {payment.reference || '-'}
-                      </td>
-                    </tr>
-                  ))
-                )}
-              </tbody>
-            </table>
-          </div>
-        </div>
+        <ResponsiveTable
+          data={data?.data || []}
+          columns={[
+            {
+              header: 'Payment Date',
+              accessor: (payment) => formatDate(payment.paymentDate),
+              mobileLabel: 'Date',
+            },
+            {
+              header: 'Invoice',
+              accessor: (payment) => payment.invoice?.invoiceNumber || 'N/A',
+              className: 'font-medium',
+            },
+            {
+              header: 'Customer',
+              accessor: (payment) => payment.invoice?.customer?.name || 'N/A',
+            },
+            {
+              header: 'Method',
+              accessor: (payment) => (
+                <div className="flex items-center gap-2">
+                  {getPaymentMethodIcon(payment.paymentMethod)}
+                  <span className="text-sm">
+                    {payment.paymentMethod.replace('_', ' ')}
+                  </span>
+                </div>
+              ),
+            },
+            {
+              header: 'Amount',
+              accessor: (payment) => formatCurrency(payment.amount),
+              className: 'font-medium text-green-600',
+            },
+            {
+              header: 'Reference',
+              accessor: (payment) => payment.reference || '-',
+              className: 'text-sm text-muted-foreground',
+              hideOnMobile: true,
+            },
+          ]}
+          keyExtractor={(payment) => payment.id}
+          isLoading={isLoading}
+          error={error as Error}
+          emptyMessage="No payments found"
+        />
 
         {/* Pagination */}
         {data && data.totalPages > 1 && (

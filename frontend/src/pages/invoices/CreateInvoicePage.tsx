@@ -99,14 +99,17 @@ export function CreateInvoicePage() {
         subtitle="Generate a new invoice for your customer"
       />
 
-      <div className="flex-1 overflow-auto p-6">
-        <form onSubmit={handleSubmit(onSubmit)} className="max-w-4xl mx-auto space-y-6">
+      <div className="flex-1 overflow-auto p-4 md:p-6">
+        <form
+          onSubmit={handleSubmit(onSubmit)}
+          className="max-w-4xl mx-auto space-y-4 md:space-y-6"
+        >
           <Card>
-            <CardHeader>
-              <CardTitle>Invoice Details</CardTitle>
+            <CardHeader className="p-4 md:p-6">
+              <CardTitle className="text-base md:text-lg">Invoice Details</CardTitle>
             </CardHeader>
-            <CardContent className="space-y-4">
-              <div className="grid grid-cols-3 gap-4">
+            <CardContent className="space-y-4 p-4 md:p-6">
+              <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
                 <div className="space-y-2">
                   <Label htmlFor="customerId">Customer *</Label>
                   <Select id="customerId" {...register('customerId')}>
@@ -144,36 +147,40 @@ export function CreateInvoicePage() {
           </Card>
 
           <Card>
-            <CardHeader className="flex flex-row items-center justify-between">
-              <CardTitle>Line Items</CardTitle>
+            <CardHeader className="flex flex-col md:flex-row items-start md:items-center justify-between gap-3 p-4 md:p-6">
+              <CardTitle className="text-base md:text-lg">Line Items</CardTitle>
               <Button
                 type="button"
                 variant="outline"
                 size="sm"
                 onClick={() => append({ description: '', quantity: 1, unitPrice: 0 })}
+                className="w-full md:w-auto"
               >
                 <Plus className="mr-2 h-4 w-4" />
                 Add Item
               </Button>
             </CardHeader>
-            <CardContent className="space-y-4">
+            <CardContent className="space-y-4 p-4 md:p-6">
               {fields.map((field, index) => (
-                <div key={field.id} className="grid grid-cols-12 gap-4 items-start">
-                  <div className="col-span-5 space-y-2">
+                <div
+                  key={field.id}
+                  className="grid grid-cols-1 md:grid-cols-12 gap-4 items-start p-4 md:p-0 border md:border-0 rounded-lg md:rounded-none"
+                >
+                  <div className="md:col-span-5 space-y-2">
                     <Label>Description</Label>
                     <Input
                       placeholder="Service or product description"
                       {...register(`items.${index}.description`)}
                     />
                   </div>
-                  <div className="col-span-2 space-y-2">
+                  <div className="md:col-span-2 space-y-2">
                     <Label>Quantity</Label>
                     <Input
                       type="number"
                       {...register(`items.${index}.quantity`, { valueAsNumber: true })}
                     />
                   </div>
-                  <div className="col-span-2 space-y-2">
+                  <div className="md:col-span-2 space-y-2">
                     <Label>Unit Price</Label>
                     <Input
                       type="number"
@@ -181,7 +188,7 @@ export function CreateInvoicePage() {
                       {...register(`items.${index}.unitPrice`, { valueAsNumber: true })}
                     />
                   </div>
-                  <div className="col-span-2 space-y-2">
+                  <div className="md:col-span-2 space-y-2">
                     <Label>Amount</Label>
                     <div className="h-10 flex items-center font-medium">
                       {formatCurrency(
@@ -189,13 +196,14 @@ export function CreateInvoicePage() {
                       )}
                     </div>
                   </div>
-                  <div className="col-span-1 flex items-end">
+                  <div className="md:col-span-1 flex items-end justify-end md:justify-start">
                     {fields.length > 1 && (
                       <Button
                         type="button"
                         variant="ghost"
                         size="icon"
                         onClick={() => remove(index)}
+                        title="Remove item"
                       >
                         <Trash2 className="h-4 w-4 text-destructive" />
                       </Button>
@@ -207,11 +215,13 @@ export function CreateInvoicePage() {
           </Card>
 
           <Card>
-            <CardHeader>
-              <CardTitle>Additional Information</CardTitle>
+            <CardHeader className="p-4 md:p-6">
+              <CardTitle className="text-base md:text-lg">
+                Additional Information
+              </CardTitle>
             </CardHeader>
-            <CardContent className="space-y-4">
-              <div className="grid grid-cols-2 gap-4">
+            <CardContent className="space-y-4 p-4 md:p-6">
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                 <div className="space-y-2">
                   <Label htmlFor="tax">Tax Amount</Label>
                   <Input

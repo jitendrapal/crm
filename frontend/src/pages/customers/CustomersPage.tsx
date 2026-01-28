@@ -158,39 +158,43 @@ export function CustomersPage() {
             No customers found. Click "Add Customer" to create one.
           </div>
         ) : (
-          <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-3">
+          <div className="grid gap-4 grid-cols-1 md:grid-cols-2 lg:grid-cols-3">
             {data.data.map((customer) => (
-              <Card key={customer.id} className="hover:shadow-md transition-shadow">
-                <CardContent className="p-6">
-                  <div className="flex items-start justify-between mb-4">
-                    <div>
-                      <h3 className="font-semibold text-lg">{customer.name}</h3>
-                      <p className="text-sm text-muted-foreground">
+              <Card
+                key={customer.id}
+                className="hover:shadow-md transition-shadow active:shadow-lg"
+              >
+                <CardContent className="p-4 md:p-6">
+                  <div className="flex items-start justify-between mb-4 gap-2">
+                    <div className="flex-1 min-w-0">
+                      <h3 className="font-semibold text-lg truncate">{customer.name}</h3>
+                      <p className="text-sm text-muted-foreground truncate">
                         {customer.city}, {customer.state}
                       </p>
                     </div>
-                    <div className="flex gap-2">
-                      <Button variant="ghost" size="icon">
+                    <div className="flex gap-1 flex-shrink-0">
+                      <Button variant="ghost" size="icon" title="Edit">
                         <Edit className="h-4 w-4" />
                       </Button>
                       <Button
                         variant="ghost"
                         size="icon"
                         onClick={() => handleDelete(customer.id, customer.name)}
+                        title="Delete"
                       >
                         <Trash2 className="h-4 w-4 text-destructive" />
                       </Button>
                     </div>
                   </div>
 
-                  <div className="space-y-2">
+                  <div className="space-y-3">
                     <div className="flex items-center gap-2 text-sm">
-                      <Mail className="h-4 w-4 text-muted-foreground" />
-                      <span>{customer.email}</span>
+                      <Mail className="h-4 w-4 text-muted-foreground flex-shrink-0" />
+                      <span className="truncate">{customer.email}</span>
                     </div>
                     {customer.phone && (
                       <div className="flex items-center gap-2 text-sm">
-                        <Phone className="h-4 w-4 text-muted-foreground" />
+                        <Phone className="h-4 w-4 text-muted-foreground flex-shrink-0" />
                         <span>{customer.phone}</span>
                       </div>
                     )}

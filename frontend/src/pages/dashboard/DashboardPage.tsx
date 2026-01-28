@@ -142,13 +142,15 @@ export function DashboardPage() {
         </div>
 
         {/* Charts */}
-        <div className="grid gap-4 md:grid-cols-2">
+        <div className="grid gap-4 grid-cols-1 md:grid-cols-2">
           <Card>
-            <CardHeader>
-              <CardTitle>Invoice Status Distribution</CardTitle>
+            <CardHeader className="p-4 md:p-6">
+              <CardTitle className="text-base md:text-lg">
+                Invoice Status Distribution
+              </CardTitle>
             </CardHeader>
-            <CardContent>
-              <ResponsiveContainer width="100%" height={300}>
+            <CardContent className="p-4 md:p-6">
+              <ResponsiveContainer width="100%" height={250}>
                 <PieChart>
                   <Pie
                     data={statusData}
@@ -173,11 +175,11 @@ export function DashboardPage() {
           </Card>
 
           <Card>
-            <CardHeader>
-              <CardTitle>Revenue Overview</CardTitle>
+            <CardHeader className="p-4 md:p-6">
+              <CardTitle className="text-base md:text-lg">Revenue Overview</CardTitle>
             </CardHeader>
-            <CardContent>
-              <ResponsiveContainer width="100%" height={300}>
+            <CardContent className="p-4 md:p-6">
+              <ResponsiveContainer width="100%" height={250}>
                 <BarChart
                   data={[
                     { name: 'Total', value: stats?.totalRevenue || 0 },
@@ -197,24 +199,24 @@ export function DashboardPage() {
 
         {/* Recent Invoices */}
         <Card>
-          <CardHeader>
-            <CardTitle>Recent Invoices</CardTitle>
+          <CardHeader className="p-4 md:p-6">
+            <CardTitle className="text-base md:text-lg">Recent Invoices</CardTitle>
           </CardHeader>
-          <CardContent>
+          <CardContent className="p-4 md:p-6">
             <div className="space-y-4">
               {recentInvoices?.map((invoice) => (
                 <div
                   key={invoice.id}
-                  className="flex items-center justify-between border-b pb-4 last:border-0"
+                  className="flex flex-col md:flex-row md:items-center justify-between gap-3 border-b pb-4 last:border-0"
                 >
-                  <div className="space-y-1">
-                    <p className="font-medium">{invoice.invoiceNumber}</p>
-                    <p className="text-sm text-muted-foreground">
+                  <div className="space-y-1 flex-1 min-w-0">
+                    <p className="font-medium truncate">{invoice.invoiceNumber}</p>
+                    <p className="text-sm text-muted-foreground truncate">
                       {invoice.customer?.name}
                     </p>
                   </div>
-                  <div className="flex items-center gap-4">
-                    <div className="text-right">
+                  <div className="flex items-center justify-between md:justify-end gap-3 md:gap-4">
+                    <div className="text-left md:text-right">
                       <p className="font-medium">{formatCurrency(invoice.total)}</p>
                       <p className="text-sm text-muted-foreground">
                         {formatDate(invoice.dueDate)}
@@ -228,6 +230,7 @@ export function DashboardPage() {
                             ? 'destructive'
                             : 'secondary'
                       }
+                      className="flex-shrink-0"
                     >
                       {invoice.status}
                     </Badge>
