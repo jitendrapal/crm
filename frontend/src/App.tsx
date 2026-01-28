@@ -13,6 +13,7 @@ import { CustomerDetailPage } from './pages/customers/CustomerDetailPage';
 import { InvoicesPage } from './pages/invoices/InvoicesPage';
 import { InvoiceDetailPage } from './pages/invoices/InvoiceDetailPage';
 import { CreateInvoicePage } from './pages/invoices/CreateInvoicePage';
+import { EditInvoicePage } from './pages/invoices/EditInvoicePage';
 import { PaymentsPage } from './pages/payments/PaymentsPage';
 import { SettingsPage } from './pages/settings/SettingsPage';
 
@@ -45,6 +46,7 @@ function App() {
           <Route path="customers/:id" element={<CustomerDetailPage />} />
           <Route path="invoices" element={<InvoicesPage />} />
           <Route path="invoices/new" element={<CreateInvoicePage />} />
+          <Route path="invoices/:id/edit" element={<EditInvoicePage />} />
           <Route path="invoices/:id" element={<InvoiceDetailPage />} />
           <Route path="payments" element={<PaymentsPage />} />
           <Route path="settings" element={<SettingsPage />} />
@@ -58,4 +60,3 @@ function App() {
 }
 
 export default App;
-

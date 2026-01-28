@@ -1,7 +1,7 @@
 import { useState } from 'react';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { useNavigate } from 'react-router-dom';
-import { Plus, Eye, Download, Send, Search, X } from 'lucide-react';
+import { Plus, Eye, Download, Send, Search, X, Edit } from 'lucide-react';
 import { toast } from 'sonner';
 import { Header } from '@/components/layout/Header';
 import { Button } from '@/components/ui/Button';
@@ -253,6 +253,14 @@ export function InvoicesPage() {
                     title="View Invoice"
                   >
                     <Eye className="h-4 w-4" />
+                  </Button>
+                  <Button
+                    variant="ghost"
+                    size="icon"
+                    onClick={() => navigate(`/invoices/${invoice.id}/edit`)}
+                    title="Edit Invoice"
+                  >
+                    <Edit className="h-4 w-4" />
                   </Button>
                   <Button
                     variant="ghost"

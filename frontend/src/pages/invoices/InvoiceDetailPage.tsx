@@ -1,7 +1,7 @@
-import { useParams } from 'react-router-dom';
+import { useParams, useNavigate } from 'react-router-dom';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { toast } from 'sonner';
-import { Download, Send } from 'lucide-react';
+import { Download, Send, Edit } from 'lucide-react';
 import { Header } from '@/components/layout/Header';
 import { Button } from '@/components/ui/Button';
 import { Badge } from '@/components/ui/Badge';
@@ -12,6 +12,7 @@ import { Invoice } from '@/types';
 
 export function InvoiceDetailPage() {
   const { id } = useParams<{ id: string }>();
+  const navigate = useNavigate();
   const queryClient = useQueryClient();
 
   const { data: invoice } = useQuery({
@@ -72,6 +73,10 @@ export function InvoiceDetailPage() {
         subtitle={`Invoice for ${invoice.customer?.name}`}
         action={
           <div className="flex gap-2">
+            <Button variant="outline" onClick={() => navigate(`/invoices/${id}/edit`)}>
+              <Edit className="mr-2 h-4 w-4" />
+              Edit
+            </Button>
             <Button variant="outline" onClick={downloadPDF}>
               <Download className="mr-2 h-4 w-4" />
               Download PDF
