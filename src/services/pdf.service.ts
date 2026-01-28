@@ -37,6 +37,21 @@ export class PDFService {
     }
   }
 
+  private getStatusColors(status: string): { bg: string; text: string } {
+    switch (status) {
+      case 'PAID':
+        return { bg: '#10b981', text: '#ffffff' }; // green
+      case 'SENT':
+        return { bg: '#3b82f6', text: '#ffffff' }; // blue
+      case 'OVERDUE':
+        return { bg: '#ef4444', text: '#ffffff' }; // red
+      case 'DRAFT':
+        return { bg: '#6b7280', text: '#ffffff' }; // gray
+      default:
+        return { bg: '#6b7280', text: '#ffffff' };
+    }
+  }
+
   async generateInvoicePDF(invoice: any): Promise<string> {
     this.ensureStorageDirectory();
 
@@ -359,7 +374,7 @@ export class PDFService {
       });
 
       // Status badge
-      const statusColors = this.getStatusColor(invoice.status);
+      const statusColors = this.getStatusColors(invoice.status);
       doc.fontSize(10).fillColor(statusColors.bg).rect(350, 100, 195, 25).fill();
       doc
         .fontSize(12)
