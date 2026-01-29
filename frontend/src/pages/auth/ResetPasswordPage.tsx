@@ -3,20 +3,22 @@ import { useNavigate, useSearchParams, Link } from 'react-router-dom';
 import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { z } from 'zod';
-import { Button } from '@/components/ui/button';
-import { Input } from '@/components/ui/input';
-import { Label } from '@/components/ui/label';
+import { Button } from '@/components/ui/Button';
+import { Input } from '@/components/ui/Input';
+import { Label } from '@/components/ui/Label';
 import { toast } from 'sonner';
 import { Lock, CheckCircle2, Shield, Key, Zap } from 'lucide-react';
 import api from '@/lib/api';
 
-const resetPasswordSchema = z.object({
-  password: z.string().min(6, 'Password must be at least 6 characters'),
-  confirmPassword: z.string(),
-}).refine((data) => data.password === data.confirmPassword, {
-  message: "Passwords don't match",
-  path: ['confirmPassword'],
-});
+const resetPasswordSchema = z
+  .object({
+    password: z.string().min(6, 'Password must be at least 6 characters'),
+    confirmPassword: z.string(),
+  })
+  .refine((data) => data.password === data.confirmPassword, {
+    message: "Passwords don't match",
+    path: ['confirmPassword'],
+  });
 
 type ResetPasswordForm = z.infer<typeof resetPasswordSchema>;
 
@@ -76,7 +78,9 @@ export function ResetPasswordPage() {
       <div className="flex min-h-screen items-center justify-center bg-gray-50">
         <div className="text-center">
           <CheckCircle2 className="mx-auto h-16 w-16 text-green-500" />
-          <h1 className="mt-4 text-2xl font-bold text-gray-900">Password Reset Successfully!</h1>
+          <h1 className="mt-4 text-2xl font-bold text-gray-900">
+            Password Reset Successfully!
+          </h1>
           <p className="mt-2 text-gray-600">Redirecting to login...</p>
         </div>
       </div>
@@ -106,7 +110,9 @@ export function ResetPasswordPage() {
               </div>
               <div>
                 <h3 className="font-semibold text-lg">Encrypted & Secure</h3>
-                <p className="text-blue-100">Your password is encrypted with industry-standard security</p>
+                <p className="text-blue-100">
+                  Your password is encrypted with industry-standard security
+                </p>
               </div>
             </div>
 
@@ -116,7 +122,9 @@ export function ResetPasswordPage() {
               </div>
               <div>
                 <h3 className="font-semibold text-lg">One-Time Link</h3>
-                <p className="text-blue-100">This reset link can only be used once for security</p>
+                <p className="text-blue-100">
+                  This reset link can only be used once for security
+                </p>
               </div>
             </div>
 
@@ -126,7 +134,9 @@ export function ResetPasswordPage() {
               </div>
               <div>
                 <h3 className="font-semibold text-lg">Instant Access</h3>
-                <p className="text-blue-100">Login immediately after resetting your password</p>
+                <p className="text-blue-100">
+                  Login immediately after resetting your password
+                </p>
               </div>
             </div>
           </div>
@@ -176,7 +186,9 @@ export function ResetPasswordPage() {
                   />
                 </div>
                 {errors.confirmPassword && (
-                  <p className="mt-1 text-sm text-red-600">{errors.confirmPassword.message}</p>
+                  <p className="mt-1 text-sm text-red-600">
+                    {errors.confirmPassword.message}
+                  </p>
                 )}
               </div>
 
@@ -196,4 +208,3 @@ export function ResetPasswordPage() {
     </div>
   );
 }
-
