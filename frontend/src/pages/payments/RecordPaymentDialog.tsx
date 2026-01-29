@@ -1,3 +1,4 @@
+import { useEffect, useState } from 'react';
 import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { z } from 'zod';
@@ -9,7 +10,7 @@ import { Label } from '@/components/ui/Label';
 import { Select } from '@/components/ui/Select';
 import { Textarea } from '@/components/ui/Textarea';
 import api from '@/lib/api';
-import { Invoice, PaymentMethod } from '@/types';
+import { Invoice, PaymentMethod, Payment } from '@/types';
 import { useCurrency } from '@/hooks/useCurrency';
 
 const paymentSchema = z.object({
@@ -31,6 +32,8 @@ interface RecordPaymentDialogProps {
 export function RecordPaymentDialog({ open, onOpenChange }: RecordPaymentDialogProps) {
   const queryClient = useQueryClient();
   const { formatCurrency } = useCurrency();
+  const [selectedInvoiceId, setSelectedInvoiceId] = useState<string>('');
+  const [selectedInvoice, setSelectedInvoice] = useState<Invoice | null>(null);
 
   const { data: invoices } = useQuery({
     queryKey: ['unpaid-invoices'],
@@ -43,10 +46,29 @@ export function RecordPaymentDialog({ open, onOpenChange }: RecordPaymentDialogP
     enabled: open,
   });
 
+  // Fetch payments for selected invoice
+  const { data: invoicePayments } = useQuery({
+    queryKey: ['invoice-payments', selectedInvoiceId],
+    queryFn: async () => {
+      const response = await api.get<{ data: Payment[] }>(
+        `/payments?invoiceId=${selectedInvoiceId}`
+      );
+      return response.data.data;
+    },
+    enabled: !!selectedInvoiceId,
+  });
+
+  // Calculate total paid and remaining balance
+  const totalPaid =
+    invoicePayments?.reduce((sum, payment) => sum + payment.amount, 0) || 0;
+  const remainingBalance = selectedInvoice ? selectedInvoice.total - totalPaid : 0;
+
   const {
     register,
     handleSubmit,
     reset,
+    setValue,
+    watch,
     formState: { errors },
   } = useForm<PaymentForm>({
     resolver: zodResolver(paymentSchema),
@@ -55,6 +77,27 @@ export function RecordPaymentDialog({ open, onOpenChange }: RecordPaymentDialogP
       paymentMethod: PaymentMethod.CREDIT_CARD,
     },
   });
+
+  const watchedInvoiceId = watch('invoiceId');
+
+  // Update selected invoice when invoice is selected
+  useEffect(() => {
+    if (watchedInvoiceId && invoices) {
+      const invoice = invoices.find((inv) => inv.id === watchedInvoiceId);
+      setSelectedInvoice(invoice || null);
+      setSelectedInvoiceId(watchedInvoiceId);
+    } else {
+      setSelectedInvoice(null);
+      setSelectedInvoiceId('');
+    }
+  }, [watchedInvoiceId, invoices]);
+
+  // Auto-fill remaining balance when invoice payments are loaded
+  useEffect(() => {
+    if (selectedInvoice && invoicePayments !== undefined) {
+      setValue('amount', remainingBalance);
+    }
+  }, [selectedInvoice, invoicePayments, remainingBalance, setValue]);
 
   const mutation = useMutation({
     mutationFn: (data: PaymentForm) => {
@@ -69,8 +112,11 @@ export function RecordPaymentDialog({ open, onOpenChange }: RecordPaymentDialogP
       queryClient.invalidateQueries({ queryKey: ['payments'] });
       queryClient.invalidateQueries({ queryKey: ['invoices'] });
       queryClient.invalidateQueries({ queryKey: ['unpaid-invoices'] });
+      queryClient.invalidateQueries({ queryKey: ['invoice-payments'] });
       toast.success('Payment recorded successfully');
       reset();
+      setSelectedInvoice(null);
+      setSelectedInvoiceId('');
       onOpenChange(false);
     },
     onError: (error: any) => {
@@ -79,6 +125,14 @@ export function RecordPaymentDialog({ open, onOpenChange }: RecordPaymentDialogP
   });
 
   const onSubmit = (data: PaymentForm) => {
+    // Validate payment amount doesn't exceed remaining balance
+    if (selectedInvoice && data.amount > remainingBalance) {
+      toast.error(
+        `Payment amount (${formatCurrency(data.amount)}) exceeds remaining balance (${formatCurrency(remainingBalance)})`
+      );
+      return;
+    }
+
     mutation.mutate(data);
   };
 
@@ -111,9 +165,67 @@ export function RecordPaymentDialog({ open, onOpenChange }: RecordPaymentDialogP
             )}
           </div>
 
+          {/* Payment Summary */}
+          {selectedInvoice && (
+            <div className="bg-muted/50 rounded-lg p-4 space-y-2 border-2 border-primary/20">
+              <h3 className="font-semibold text-sm text-primary">Payment Summary</h3>
+              <div className="space-y-1.5 text-sm">
+                <div className="flex justify-between">
+                  <span className="text-muted-foreground">Invoice Total:</span>
+                  <span className="font-medium">
+                    {formatCurrency(selectedInvoice.total)}
+                  </span>
+                </div>
+                <div className="flex justify-between">
+                  <span className="text-muted-foreground">Total Paid:</span>
+                  <span className="font-medium text-green-600">
+                    {formatCurrency(totalPaid)}
+                  </span>
+                </div>
+                <div className="border-t pt-1.5 mt-1.5">
+                  <div className="flex justify-between items-center">
+                    <span className="font-semibold">Amount Due:</span>
+                    <span className="font-bold text-lg text-primary">
+                      {formatCurrency(remainingBalance)}
+                    </span>
+                  </div>
+                </div>
+              </div>
+              {invoicePayments && invoicePayments.length > 0 && (
+                <div className="mt-3 pt-3 border-t">
+                  <p className="text-xs text-muted-foreground mb-2">
+                    Previous Payments ({invoicePayments.length}):
+                  </p>
+                  <div className="space-y-1 max-h-24 overflow-y-auto">
+                    {invoicePayments.map((payment) => (
+                      <div
+                        key={payment.id}
+                        className="flex justify-between text-xs bg-background/50 rounded px-2 py-1"
+                      >
+                        <span className="text-muted-foreground">
+                          {new Date(payment.paymentDate).toLocaleDateString()}
+                        </span>
+                        <span className="font-medium">
+                          {formatCurrency(payment.amount)}
+                        </span>
+                      </div>
+                    ))}
+                  </div>
+                </div>
+              )}
+            </div>
+          )}
+
           <div className="grid grid-cols-2 gap-4">
             <div className="space-y-2">
-              <Label htmlFor="amount">Amount *</Label>
+              <Label htmlFor="amount">
+                Payment Amount *
+                {selectedInvoice && remainingBalance > 0 && (
+                  <span className="text-xs text-muted-foreground ml-1">
+                    (Due: {formatCurrency(remainingBalance)})
+                  </span>
+                )}
+              </Label>
               <Input
                 id="amount"
                 type="number"
