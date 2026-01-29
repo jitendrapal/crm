@@ -1,7 +1,7 @@
 import { useParams, useNavigate } from 'react-router-dom';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { toast } from 'sonner';
-import { Download, Send, Edit } from 'lucide-react';
+import { Download, Send, Edit, Bell } from 'lucide-react';
 import { Header } from '@/components/layout/Header';
 import { Button } from '@/components/ui/Button';
 import { Badge } from '@/components/ui/Badge';
@@ -33,6 +33,16 @@ export function InvoiceDetailPage() {
     },
     onError: (error: any) => {
       toast.error(error.response?.data?.message || 'Failed to send invoice');
+    },
+  });
+
+  const reminderMutation = useMutation({
+    mutationFn: () => api.post(`/invoices/${id}/remind`),
+    onSuccess: () => {
+      toast.success('Payment reminder sent successfully');
+    },
+    onError: (error: any) => {
+      toast.error(error.response?.data?.error || 'Failed to send reminder');
     },
   });
 
@@ -84,9 +94,22 @@ export function InvoiceDetailPage() {
               Download PDF
             </Button>
             {invoice.status === 'DRAFT' && (
-              <Button onClick={() => sendMutation.mutate()}>
+              <Button
+                onClick={() => sendMutation.mutate()}
+                disabled={sendMutation.isPending}
+              >
                 <Send className="mr-2 h-4 w-4" />
-                Send Invoice
+                {sendMutation.isPending ? 'Sending...' : 'Send Invoice'}
+              </Button>
+            )}
+            {(invoice.status === 'SENT' || invoice.status === 'OVERDUE') && (
+              <Button
+                variant="outline"
+                onClick={() => reminderMutation.mutate()}
+                disabled={reminderMutation.isPending}
+              >
+                <Bell className="mr-2 h-4 w-4" />
+                {reminderMutation.isPending ? 'Sending...' : 'Send Reminder'}
               </Button>
             )}
           </div>
