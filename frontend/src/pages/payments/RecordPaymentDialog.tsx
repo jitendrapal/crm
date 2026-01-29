@@ -108,12 +108,14 @@ export function RecordPaymentDialog({ open, onOpenChange }: RecordPaymentDialogP
       };
       return api.post('/payments', paymentData);
     },
-    onSuccess: () => {
+    onSuccess: (_data, variables) => {
       queryClient.invalidateQueries({ queryKey: ['payments'] });
       queryClient.invalidateQueries({ queryKey: ['invoices'] });
       queryClient.invalidateQueries({ queryKey: ['unpaid-invoices'] });
       queryClient.invalidateQueries({ queryKey: ['invoice-payments'] });
-      toast.success('Payment recorded successfully');
+      toast.success(
+        `Payment of ${formatCurrency(variables.amount)} recorded for Invoice ${selectedInvoice?.invoiceNumber || ''}`
+      );
       reset();
       setSelectedInvoice(null);
       setSelectedInvoiceId('');

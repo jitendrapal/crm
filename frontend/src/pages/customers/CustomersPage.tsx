@@ -1,6 +1,6 @@
 import { useState } from 'react';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
-import { Plus, Edit, Trash2, Mail, Phone, Search, X } from 'lucide-react';
+import { Plus, Edit, Trash2, Mail, Phone, Search, X, Users } from 'lucide-react';
 import { toast } from 'sonner';
 import { Header } from '@/components/layout/Header';
 import { Button } from '@/components/ui/Button';
@@ -8,6 +8,7 @@ import { Card, CardContent } from '@/components/ui/Card';
 import { Input } from '@/components/ui/Input';
 import { CreateCustomerDialog } from './CreateCustomerDialog';
 import { EditCustomerDialog } from './EditCustomerDialog';
+import { ConfirmDialog } from '@/components/ui/ConfirmDialog';
 import api from '@/lib/api';
 import { Customer, PaginatedResponse } from '@/types';
 
@@ -15,6 +16,11 @@ export function CustomersPage() {
   const [isCreateOpen, setIsCreateOpen] = useState(false);
   const [isEditOpen, setIsEditOpen] = useState(false);
   const [selectedCustomer, setSelectedCustomer] = useState<Customer | null>(null);
+  const [isDeleteOpen, setIsDeleteOpen] = useState(false);
+  const [customerToDelete, setCustomerToDelete] = useState<{
+    id: string;
+    name: string;
+  } | null>(null);
   const [page, setPage] = useState(1);
   const [searchQuery, setSearchQuery] = useState('');
   const [city, setCity] = useState('');
@@ -59,7 +65,7 @@ export function CustomersPage() {
     mutationFn: (id: string) => api.delete(`/customers/${id}`),
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['customers'] });
-      toast.success('Customer deleted successfully');
+      toast.success(`Customer "${customerToDelete?.name}" deleted successfully`);
     },
     onError: (error: any) => {
       const errorMessage =
@@ -72,8 +78,14 @@ export function CustomersPage() {
   });
 
   const handleDelete = (id: string, name: string) => {
-    if (confirm(`Are you sure you want to delete ${name}?`)) {
-      deleteMutation.mutate(id);
+    setCustomerToDelete({ id, name });
+    setIsDeleteOpen(true);
+  };
+
+  const confirmDelete = () => {
+    if (customerToDelete) {
+      deleteMutation.mutate(customerToDelete.id);
+      setCustomerToDelete(null);
     }
   };
 
@@ -167,8 +179,30 @@ export function CustomersPage() {
             Error loading customers: {(error as any)?.message || 'Unknown error'}
           </div>
         ) : !data?.data || data.data.length === 0 ? (
-          <div className="text-center py-12 text-muted-foreground">
-            No customers found. Click "Add Customer" to create one.
+          <div className="flex flex-col items-center justify-center py-16 px-4">
+            <div className="w-20 h-20 rounded-full bg-info/10 flex items-center justify-center mb-6">
+              <Users className="h-10 w-10 text-info" />
+            </div>
+            <h3 className="text-xl font-semibold mb-2">
+              {hasActiveFilters ? 'No customers found' : 'No customers yet'}
+            </h3>
+            <p className="text-muted-foreground text-center max-w-md mb-6">
+              {hasActiveFilters
+                ? "Try adjusting your search or filters to find what you're looking for."
+                : 'Add your first customer to start creating invoices and tracking payments.'}
+            </p>
+            {!hasActiveFilters && (
+              <Button onClick={() => setIsCreateOpen(true)} size="lg">
+                <Plus className="mr-2 h-5 w-5" />
+                Add Your First Customer
+              </Button>
+            )}
+            {hasActiveFilters && (
+              <Button onClick={clearFilters} variant="outline">
+                <X className="mr-2 h-4 w-4" />
+                Clear Filters
+              </Button>
+            )}
           </div>
         ) : (
           <div className="grid gap-4 grid-cols-1 md:grid-cols-2 lg:grid-cols-3">
@@ -260,6 +294,17 @@ export function CustomersPage() {
         open={isEditOpen}
         onOpenChange={setIsEditOpen}
         customer={selectedCustomer}
+      />
+      <ConfirmDialog
+        open={isDeleteOpen}
+        onOpenChange={setIsDeleteOpen}
+        title="Delete Customer"
+        description={`Are you sure you want to delete ${customerToDelete?.name}? This action cannot be undone.`}
+        confirmText="Delete"
+        cancelText="Cancel"
+        variant="destructive"
+        onConfirm={confirmDelete}
+        isLoading={deleteMutation.isPending}
       />
     </div>
   );

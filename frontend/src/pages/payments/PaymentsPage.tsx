@@ -1,6 +1,6 @@
 import { useState } from 'react';
 import { useQuery } from '@tanstack/react-query';
-import { Plus, CreditCard, Search, X } from 'lucide-react';
+import { Plus, CreditCard, Search, X, Wallet } from 'lucide-react';
 import { Header } from '@/components/layout/Header';
 import { Button } from '@/components/ui/Button';
 import { Input } from '@/components/ui/Input';
@@ -205,7 +205,33 @@ export function PaymentsPage() {
           keyExtractor={(payment) => payment.id}
           isLoading={isLoading}
           error={error as Error}
-          emptyMessage="No payments found"
+          emptyState={
+            <div className="flex flex-col items-center justify-center">
+              <div className="w-20 h-20 rounded-full bg-success/10 flex items-center justify-center mb-6">
+                <Wallet className="h-10 w-10 text-success" />
+              </div>
+              <h3 className="text-xl font-semibold mb-2">
+                {hasActiveFilters ? 'No payments found' : 'No payments yet'}
+              </h3>
+              <p className="text-muted-foreground text-center max-w-md mb-6">
+                {hasActiveFilters
+                  ? "Try adjusting your filters to find what you're looking for."
+                  : 'Record your first payment when a customer pays an invoice.'}
+              </p>
+              {!hasActiveFilters && (
+                <Button onClick={() => setIsRecordOpen(true)} size="lg">
+                  <Plus className="mr-2 h-5 w-5" />
+                  Record Your First Payment
+                </Button>
+              )}
+              {hasActiveFilters && (
+                <Button onClick={clearFilters} variant="outline">
+                  <X className="mr-2 h-4 w-4" />
+                  Clear Filters
+                </Button>
+              )}
+            </div>
+          }
         />
 
         {/* Pagination */}

@@ -17,6 +17,7 @@ interface ResponsiveTableProps<T> {
   isLoading?: boolean;
   error?: Error | null;
   emptyMessage?: string;
+  emptyState?: React.ReactNode; // Custom empty state component
   className?: string;
 }
 
@@ -28,6 +29,7 @@ export function ResponsiveTable<T>({
   isLoading,
   error,
   emptyMessage = 'No data found',
+  emptyState,
   className,
 }: ResponsiveTableProps<T>) {
   const getCellValue = (row: T, column: Column<T>) => {
@@ -58,7 +60,13 @@ export function ResponsiveTable<T>({
   if (!data || data.length === 0) {
     return (
       <div className="bg-card rounded-lg border">
-        <div className="px-6 py-12 text-center text-muted-foreground">{emptyMessage}</div>
+        {emptyState ? (
+          <div className="px-6 py-16">{emptyState}</div>
+        ) : (
+          <div className="px-6 py-12 text-center text-muted-foreground">
+            {emptyMessage}
+          </div>
+        )}
       </div>
     );
   }
@@ -95,10 +103,7 @@ export function ResponsiveTable<T>({
                   )}
                 >
                   {columns.map((column, index) => (
-                    <td
-                      key={index}
-                      className={cn('px-6 py-4', column.className)}
-                    >
+                    <td key={index} className={cn('px-6 py-4', column.className)}>
                       {getCellValue(row, column)}
                     </td>
                   ))}
@@ -138,4 +143,3 @@ export function ResponsiveTable<T>({
     </>
   );
 }
-

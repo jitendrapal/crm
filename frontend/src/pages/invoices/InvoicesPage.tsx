@@ -1,7 +1,7 @@
 import { useState } from 'react';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { useNavigate } from 'react-router-dom';
-import { Plus, Eye, Download, Send, Search, X, Edit } from 'lucide-react';
+import { Plus, Eye, Download, Send, Search, X, Edit, FileText } from 'lucide-react';
 import { toast } from 'sonner';
 import { Header } from '@/components/layout/Header';
 import { Button } from '@/components/ui/Button';
@@ -90,18 +90,21 @@ export function InvoicesPage() {
       document.body.appendChild(link);
       link.click();
       link.remove();
-      toast.success('PDF downloaded successfully');
+      toast.success(`Invoice ${invoice.invoiceNumber} downloaded successfully`);
     } catch (error) {
-      toast.error('Failed to download PDF');
+      toast.error(`Failed to download invoice ${invoice.invoiceNumber}`);
     }
   };
 
   // Send invoice mutation
   const sendInvoiceMutation = useMutation({
     mutationFn: (invoiceId: string) => api.post(`/invoices/${invoiceId}/send`),
-    onSuccess: () => {
+    onSuccess: (_data, invoiceId) => {
       queryClient.invalidateQueries({ queryKey: ['invoices'] });
-      toast.success('Invoice sent successfully');
+      const invoice = data?.data.find((inv) => inv.id === invoiceId);
+      toast.success(
+        `Invoice ${invoice?.invoiceNumber || ''} sent to ${invoice?.customer?.name || 'customer'}`
+      );
     },
     onError: (error: any) => {
       toast.error(error.response?.data?.message || 'Failed to send invoice');
@@ -292,7 +295,33 @@ export function InvoicesPage() {
           keyExtractor={(invoice) => invoice.id}
           isLoading={isLoading}
           error={error as Error}
-          emptyMessage="No invoices found"
+          emptyState={
+            <div className="flex flex-col items-center justify-center">
+              <div className="w-20 h-20 rounded-full bg-primary/10 flex items-center justify-center mb-6">
+                <FileText className="h-10 w-10 text-primary" />
+              </div>
+              <h3 className="text-xl font-semibold mb-2">
+                {hasActiveFilters ? 'No invoices found' : 'No invoices yet'}
+              </h3>
+              <p className="text-muted-foreground text-center max-w-md mb-6">
+                {hasActiveFilters
+                  ? "Try adjusting your filters to find what you're looking for."
+                  : 'Create your first invoice to start billing your customers and tracking payments.'}
+              </p>
+              {!hasActiveFilters && (
+                <Button onClick={() => navigate('/invoices/new')} size="lg">
+                  <Plus className="mr-2 h-5 w-5" />
+                  Create Your First Invoice
+                </Button>
+              )}
+              {hasActiveFilters && (
+                <Button onClick={clearFilters} variant="outline">
+                  <X className="mr-2 h-4 w-4" />
+                  Clear Filters
+                </Button>
+              )}
+            </div>
+          }
         />
 
         {/* Pagination */}
