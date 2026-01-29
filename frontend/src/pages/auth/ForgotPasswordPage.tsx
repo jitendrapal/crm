@@ -108,7 +108,7 @@ export function ForgotPasswordPage() {
             <div className="mt-12 p-4 rounded-lg bg-white/5 backdrop-blur-sm border border-white/10">
               <p className="text-sm text-blue-50">
                 <strong>Need help?</strong> Contact our support team at{' '}
-                <a href="mailto:support@invoicecrm.com" className="underline">
+                <a href="mailto:support@inyic.com" className="underline">
                   support@invoicecrm.com
                 </a>
               </p>
