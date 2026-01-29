@@ -120,22 +120,6 @@ export function LoginPage() {
                 </div>
               </div>
             </div>
-
-            {/* Stats */}
-            <div className="grid grid-cols-3 gap-6 pt-8 border-t border-white/20">
-              <div>
-                <div className="text-3xl font-bold">10K+</div>
-                <div className="text-sm text-blue-100">Invoices Created</div>
-              </div>
-              <div>
-                <div className="text-3xl font-bold">500+</div>
-                <div className="text-sm text-blue-100">Happy Users</div>
-              </div>
-              <div>
-                <div className="text-3xl font-bold">99.9%</div>
-                <div className="text-sm text-blue-100">Uptime</div>
-              </div>
-            </div>
           </div>
         </div>
       </div>

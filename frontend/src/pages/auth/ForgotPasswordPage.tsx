@@ -45,7 +45,79 @@ export function ForgotPasswordPage() {
 
   return (
     <div className="flex min-h-screen">
-      {/* Left Side - Forgot Password Form */}
+      {/* Left Side - Feature Showcase */}
+      <div className="relative hidden lg:flex lg:flex-1 bg-gradient-to-br from-blue-600 via-indigo-600 to-purple-700">
+        {/* Decorative Background Pattern */}
+        <div className="absolute inset-0 bg-grid-white/[0.05] bg-[size:20px_20px]" />
+
+        <div className="relative flex flex-col justify-center px-12 xl:px-16 text-white">
+          {/* Main Content */}
+          <div className="max-w-md">
+            <div className="mb-8">
+              <div className="inline-flex h-16 w-16 items-center justify-center rounded-2xl bg-white/10 backdrop-blur-sm mb-6">
+                <Mail className="h-8 w-8" />
+              </div>
+            </div>
+
+            <h2 className="text-4xl font-bold mb-4">Secure Password Reset</h2>
+            <p className="text-lg text-blue-100 mb-8">
+              We'll send you a secure link to reset your password and get you back to
+              managing your invoices.
+            </p>
+
+            {/* Security Features */}
+            <div className="space-y-4">
+              <div className="flex items-start gap-3">
+                <div className="flex h-6 w-6 items-center justify-center rounded-full bg-white/20 mt-1">
+                  <span className="text-xs">✓</span>
+                </div>
+                <div>
+                  <h3 className="font-semibold mb-1">Secure & Encrypted</h3>
+                  <p className="text-sm text-blue-100">
+                    All password reset links are encrypted and expire after 1 hour
+                  </p>
+                </div>
+              </div>
+
+              <div className="flex items-start gap-3">
+                <div className="flex h-6 w-6 items-center justify-center rounded-full bg-white/20 mt-1">
+                  <span className="text-xs">✓</span>
+                </div>
+                <div>
+                  <h3 className="font-semibold mb-1">Email Verification</h3>
+                  <p className="text-sm text-blue-100">
+                    Only you can access the reset link sent to your email
+                  </p>
+                </div>
+              </div>
+
+              <div className="flex items-start gap-3">
+                <div className="flex h-6 w-6 items-center justify-center rounded-full bg-white/20 mt-1">
+                  <span className="text-xs">✓</span>
+                </div>
+                <div>
+                  <h3 className="font-semibold mb-1">Quick & Easy</h3>
+                  <p className="text-sm text-blue-100">
+                    Reset your password in just a few clicks and get back to work
+                  </p>
+                </div>
+              </div>
+            </div>
+
+            {/* Help Text */}
+            <div className="mt-12 p-4 rounded-lg bg-white/5 backdrop-blur-sm border border-white/10">
+              <p className="text-sm text-blue-50">
+                <strong>Need help?</strong> Contact our support team at{' '}
+                <a href="mailto:support@invoicecrm.com" className="underline">
+                  support@invoicecrm.com
+                </a>
+              </p>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      {/* Right Side - Forgot Password Form */}
       <div className="flex flex-1 flex-col justify-center px-4 py-12 sm:px-6 lg:flex-none lg:px-20 xl:px-24 bg-background">
         <div className="mx-auto w-full max-w-sm lg:w-96">
           {/* Logo and Brand */}
@@ -159,78 +231,6 @@ export function ForgotPasswordPage() {
               </div>
             </>
           )}
-        </div>
-      </div>
-
-      {/* Right Side - Feature Showcase */}
-      <div className="relative hidden lg:flex lg:flex-1 bg-gradient-to-br from-blue-600 via-indigo-600 to-purple-700">
-        {/* Decorative Background Pattern */}
-        <div className="absolute inset-0 bg-grid-white/[0.05] bg-[size:20px_20px]" />
-
-        <div className="relative flex flex-col justify-center px-12 xl:px-16 text-white">
-          {/* Main Content */}
-          <div className="max-w-md">
-            <div className="mb-8">
-              <div className="inline-flex h-16 w-16 items-center justify-center rounded-2xl bg-white/10 backdrop-blur-sm mb-6">
-                <Mail className="h-8 w-8" />
-              </div>
-            </div>
-
-            <h2 className="text-4xl font-bold mb-4">Secure Password Reset</h2>
-            <p className="text-lg text-blue-100 mb-8">
-              We'll send you a secure link to reset your password and get you back to
-              managing your invoices.
-            </p>
-
-            {/* Security Features */}
-            <div className="space-y-4">
-              <div className="flex items-start gap-3">
-                <div className="flex h-6 w-6 items-center justify-center rounded-full bg-white/20 mt-1">
-                  <span className="text-xs">✓</span>
-                </div>
-                <div>
-                  <h3 className="font-semibold mb-1">Secure & Encrypted</h3>
-                  <p className="text-sm text-blue-100">
-                    All password reset links are encrypted and expire after 1 hour
-                  </p>
-                </div>
-              </div>
-
-              <div className="flex items-start gap-3">
-                <div className="flex h-6 w-6 items-center justify-center rounded-full bg-white/20 mt-1">
-                  <span className="text-xs">✓</span>
-                </div>
-                <div>
-                  <h3 className="font-semibold mb-1">Email Verification</h3>
-                  <p className="text-sm text-blue-100">
-                    Only you can access the reset link sent to your email
-                  </p>
-                </div>
-              </div>
-
-              <div className="flex items-start gap-3">
-                <div className="flex h-6 w-6 items-center justify-center rounded-full bg-white/20 mt-1">
-                  <span className="text-xs">✓</span>
-                </div>
-                <div>
-                  <h3 className="font-semibold mb-1">Quick & Easy</h3>
-                  <p className="text-sm text-blue-100">
-                    Reset your password in just a few clicks and get back to work
-                  </p>
-                </div>
-              </div>
-            </div>
-
-            {/* Help Text */}
-            <div className="mt-12 p-4 rounded-lg bg-white/5 backdrop-blur-sm border border-white/10">
-              <p className="text-sm text-blue-50">
-                <strong>Need help?</strong> Contact our support team at{' '}
-                <a href="mailto:support@invoicecrm.com" className="underline">
-                  support@invoicecrm.com
-                </a>
-              </p>
-            </div>
-          </div>
         </div>
       </div>
     </div>
