@@ -24,7 +24,7 @@ const querySchema = z.object({
   isActive: z
     .string()
     .optional()
-    .transform((val) => val === 'true'),
+    .transform((val) => (val === undefined ? undefined : val === 'true')),
   page: z
     .string()
     .optional()
