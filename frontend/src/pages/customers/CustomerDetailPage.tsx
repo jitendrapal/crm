@@ -5,11 +5,13 @@ import { Header } from '@/components/layout/Header';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/Card';
 import { Badge } from '@/components/ui/Badge';
 import api from '@/lib/api';
-import { formatCurrency, formatDate } from '@/lib/utils';
+import { formatDate } from '@/lib/utils';
 import { Customer, Invoice } from '@/types';
+import { useCurrency } from '@/hooks/useCurrency';
 
 export function CustomerDetailPage() {
   const { id } = useParams<{ id: string }>();
+  const { formatCurrency } = useCurrency();
 
   const { data: customer } = useQuery({
     queryKey: ['customer', id],
@@ -72,10 +74,15 @@ export function CustomerDetailPage() {
             <CardContent>
               <div className="space-y-3">
                 {invoices?.map((invoice) => (
-                  <div key={invoice.id} className="flex items-center justify-between border-b pb-3 last:border-0">
+                  <div
+                    key={invoice.id}
+                    className="flex items-center justify-between border-b pb-3 last:border-0"
+                  >
                     <div>
                       <p className="font-medium">{invoice.invoiceNumber}</p>
-                      <p className="text-sm text-muted-foreground">{formatDate(invoice.issueDate)}</p>
+                      <p className="text-sm text-muted-foreground">
+                        {formatDate(invoice.issueDate)}
+                      </p>
                     </div>
                     <div className="flex items-center gap-3">
                       <span className="font-medium">{formatCurrency(invoice.total)}</span>
@@ -84,8 +91,8 @@ export function CustomerDetailPage() {
                           invoice.status === 'PAID'
                             ? 'success'
                             : invoice.status === 'OVERDUE'
-                            ? 'destructive'
-                            : 'secondary'
+                              ? 'destructive'
+                              : 'secondary'
                         }
                       >
                         {invoice.status}
@@ -101,4 +108,3 @@ export function CustomerDetailPage() {
     </div>
   );
 }
-

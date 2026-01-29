@@ -7,13 +7,15 @@ import { Button } from '@/components/ui/Button';
 import { Badge } from '@/components/ui/Badge';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/Card';
 import api from '@/lib/api';
-import { formatCurrency, formatDate } from '@/lib/utils';
+import { formatDate } from '@/lib/utils';
 import { Invoice } from '@/types';
+import { useCurrency } from '@/hooks/useCurrency';
 
 export function InvoiceDetailPage() {
   const { id } = useParams<{ id: string }>();
   const navigate = useNavigate();
   const queryClient = useQueryClient();
+  const { formatCurrency } = useCurrency();
 
   const { data: invoice } = useQuery({
     queryKey: ['invoice', id],

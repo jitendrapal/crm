@@ -1,18 +1,28 @@
 import { type ClassValue, clsx } from 'clsx';
 import { twMerge } from 'tailwind-merge';
+import { Currency } from '@/types';
 
 export function cn(...inputs: ClassValue[]) {
   return twMerge(clsx(inputs));
 }
 
-export function formatCurrency(amount: number | null | undefined): string {
+const CURRENCY_CONFIG = {
+  USD: { symbol: '$', locale: 'en-US' },
+  EUR: { symbol: '€', locale: 'de-DE' },
+  INR: { symbol: '₹', locale: 'en-IN' },
+} as const;
+
+export function formatCurrency(
+  amount: number | null | undefined,
+  currency: Currency = 'USD'
+): string {
   if (amount === null || amount === undefined || isNaN(amount)) {
-    return '$0.00';
+    return `${CURRENCY_CONFIG[currency].symbol}0.00`;
   }
 
-  return new Intl.NumberFormat('en-US', {
+  return new Intl.NumberFormat(CURRENCY_CONFIG[currency].locale, {
     style: 'currency',
-    currency: 'USD',
+    currency: currency,
   }).format(amount);
 }
 

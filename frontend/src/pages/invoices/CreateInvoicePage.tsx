@@ -13,8 +13,8 @@ import { Select } from '@/components/ui/Select';
 import { Textarea } from '@/components/ui/Textarea';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/Card';
 import api from '@/lib/api';
-import { formatCurrency } from '@/lib/utils';
 import { Customer } from '@/types';
+import { useCurrency } from '@/hooks/useCurrency';
 
 const invoiceSchema = z.object({
   customerId: z.string().min(1, 'Customer is required'),
@@ -38,6 +38,7 @@ type InvoiceForm = z.infer<typeof invoiceSchema>;
 
 export function CreateInvoicePage() {
   const navigate = useNavigate();
+  const { formatCurrency } = useCurrency();
 
   const { data: customers } = useQuery({
     queryKey: ['customers-all'],

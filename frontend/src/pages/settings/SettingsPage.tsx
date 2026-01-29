@@ -27,6 +27,7 @@ const companySchema = z.object({
   email: z.string().email('Invalid email address'),
   phone: z.string().optional(),
   address: z.string().optional(),
+  currency: z.enum(['USD', 'EUR', 'INR']).optional(),
 });
 
 const profileSchema = z.object({
@@ -73,6 +74,7 @@ export function SettingsPage() {
       email: tenant?.email || '',
       phone: tenant?.phone || '',
       address: tenant?.address || '',
+      currency: tenant?.currency || 'USD',
     },
   });
 
@@ -196,6 +198,23 @@ export function SettingsPage() {
                     <div className="space-y-2">
                       <Label htmlFor="companyAddress">Address (Optional)</Label>
                       <Input id="companyAddress" {...companyForm.register('address')} />
+                    </div>
+
+                    <div className="space-y-2">
+                      <Label htmlFor="currency">Currency</Label>
+                      <select
+                        id="currency"
+                        {...companyForm.register('currency')}
+                        className="flex h-10 w-full rounded-md border border-input bg-background px-3 py-2 text-sm ring-offset-background file:border-0 file:bg-transparent file:text-sm file:font-medium placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50"
+                      >
+                        <option value="USD">$ - US Dollar (USD)</option>
+                        <option value="EUR">€ - Euro (EUR)</option>
+                        <option value="INR">₹ - Indian Rupee (INR)</option>
+                      </select>
+                      <p className="text-sm text-muted-foreground">
+                        This currency will be used throughout the application for
+                        invoices, payments, and reports.
+                      </p>
                     </div>
 
                     <Button

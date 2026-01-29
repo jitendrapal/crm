@@ -10,12 +10,14 @@ import { Select } from '@/components/ui/Select';
 import { Input } from '@/components/ui/Input';
 import { ResponsiveTable } from '@/components/ui/ResponsiveTable';
 import api from '@/lib/api';
-import { formatCurrency, formatDate } from '@/lib/utils';
+import { formatDate } from '@/lib/utils';
 import { Invoice, InvoiceStatus, PaginatedResponse } from '@/types';
+import { useCurrency } from '@/hooks/useCurrency';
 
 export function InvoicesPage() {
   const navigate = useNavigate();
   const queryClient = useQueryClient();
+  const { formatCurrency } = useCurrency();
   const [page, setPage] = useState(1);
   const [statusFilter, setStatusFilter] = useState<InvoiceStatus | 'ALL'>('ALL');
   const [searchQuery, setSearchQuery] = useState('');

@@ -30,12 +30,15 @@ export interface User {
   updatedAt: string;
 }
 
+export type Currency = 'USD' | 'EUR' | 'INR';
+
 export interface Tenant {
   id: string;
   name: string;
   email: string;
   phone?: string;
   address?: string;
+  currency?: Currency;
   createdAt: string;
   updatedAt: string;
 }
@@ -118,4 +121,3 @@ export interface DashboardStats {
   pendingRevenue: number;
   totalCustomers: number;
 }
-

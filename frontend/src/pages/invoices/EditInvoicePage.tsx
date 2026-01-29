@@ -14,8 +14,8 @@ import { Select } from '@/components/ui/Select';
 import { Textarea } from '@/components/ui/Textarea';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/Card';
 import api from '@/lib/api';
-import { formatCurrency } from '@/lib/utils';
 import { Customer, Invoice } from '@/types';
+import { useCurrency } from '@/hooks/useCurrency';
 
 const invoiceSchema = z.object({
   customerId: z.string().min(1, 'Customer is required'),
@@ -42,6 +42,7 @@ export function EditInvoicePage() {
   const { id } = useParams<{ id: string }>();
   const navigate = useNavigate();
   const queryClient = useQueryClient();
+  const { formatCurrency } = useCurrency();
 
   const { data: invoice, isLoading: invoiceLoading } = useQuery({
     queryKey: ['invoice', id],

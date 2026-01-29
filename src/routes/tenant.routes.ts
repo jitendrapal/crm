@@ -8,6 +8,7 @@ const updateTenantSchema = z.object({
   email: z.string().email().optional(),
   phone: z.string().optional(),
   address: z.string().optional(),
+  currency: z.enum(['USD', 'EUR', 'INR']).optional(),
 });
 
 export async function tenantRoutes(fastify: FastifyInstance) {
@@ -77,4 +78,3 @@ export async function tenantRoutes(fastify: FastifyInstance) {
     }
   });
 }
-

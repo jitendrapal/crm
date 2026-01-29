@@ -8,10 +8,12 @@ import { Select } from '@/components/ui/Select';
 import { ResponsiveTable } from '@/components/ui/ResponsiveTable';
 import { RecordPaymentDialog } from './RecordPaymentDialog';
 import api from '@/lib/api';
-import { formatCurrency, formatDate } from '@/lib/utils';
+import { formatDate } from '@/lib/utils';
 import { Payment, PaginatedResponse } from '@/types';
+import { useCurrency } from '@/hooks/useCurrency';
 
 export function PaymentsPage() {
+  const { formatCurrency } = useCurrency();
   const [isRecordOpen, setIsRecordOpen] = useState(false);
   const [page, setPage] = useState(1);
   const [searchQuery, setSearchQuery] = useState('');

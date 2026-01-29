@@ -4,8 +4,9 @@ import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/Card';
 import { Header } from '@/components/layout/Header';
 import { Badge } from '@/components/ui/Badge';
 import api from '@/lib/api';
-import { formatCurrency, formatDate } from '@/lib/utils';
+import { formatDate } from '@/lib/utils';
 import { Invoice, DashboardStats } from '@/types';
+import { useCurrency } from '@/hooks/useCurrency';
 import {
   BarChart,
   Bar,
@@ -22,6 +23,8 @@ import {
 const COLORS = ['#3b82f6', '#10b981', '#f59e0b', '#ef4444'];
 
 export function DashboardPage() {
+  const { formatCurrency } = useCurrency();
+
   const { data: stats } = useQuery({
     queryKey: ['dashboard-stats'],
     queryFn: async () => {
