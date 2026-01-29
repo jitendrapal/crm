@@ -141,149 +141,196 @@ export function RecordPaymentDialog({ open, onOpenChange }: RecordPaymentDialogP
   if (!open) return null;
 
   return (
-    <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/50">
-      <div className="bg-card rounded-lg shadow-lg w-full max-w-md">
-        <div className="p-6 border-b">
-          <h2 className="text-2xl font-bold">Record Payment</h2>
-          <p className="text-sm text-muted-foreground">
-            Record a payment received from a customer
-          </p>
-        </div>
+    <>
+      {/* Backdrop */}
+      <div
+        className="fixed inset-0 z-50 bg-black/50"
+        onClick={() => onOpenChange(false)}
+      />
 
-        <form onSubmit={handleSubmit(onSubmit)} className="p-6 space-y-4">
-          <div className="space-y-2">
-            <Label htmlFor="invoiceId">Invoice *</Label>
-            <Select id="invoiceId" {...register('invoiceId')}>
-              <option value="">Select invoice</option>
-              {invoices?.map((invoice) => (
-                <option key={invoice.id} value={invoice.id}>
-                  {invoice.invoiceNumber} - {invoice.customer?.name} (
-                  {formatCurrency(invoice.total)})
-                </option>
-              ))}
-            </Select>
-            {errors.invoiceId && (
-              <p className="text-sm text-destructive">{errors.invoiceId.message}</p>
-            )}
+      {/* Dialog */}
+      <div className="fixed left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2 z-50 w-full max-w-2xl max-h-[90vh] flex flex-col">
+        <div className="bg-card rounded-lg shadow-lg flex flex-col max-h-[90vh]">
+          {/* Fixed Header */}
+          <div className="flex items-center justify-between p-6 border-b flex-shrink-0">
+            <div>
+              <h2 className="text-2xl font-bold">Record Payment</h2>
+              <p className="text-sm text-muted-foreground">
+                Record a payment received from a customer
+              </p>
+            </div>
+            <button
+              type="button"
+              onClick={() => onOpenChange(false)}
+              className="rounded-sm opacity-70 ring-offset-background transition-opacity hover:opacity-100 focus:outline-none focus:ring-2 focus:ring-ring focus:ring-offset-2"
+            >
+              <svg
+                xmlns="http://www.w3.org/2000/svg"
+                width="24"
+                height="24"
+                viewBox="0 0 24 24"
+                fill="none"
+                stroke="currentColor"
+                strokeWidth="2"
+                strokeLinecap="round"
+                strokeLinejoin="round"
+                className="h-5 w-5"
+              >
+                <line x1="18" y1="6" x2="6" y2="18"></line>
+                <line x1="6" y1="6" x2="18" y2="18"></line>
+              </svg>
+              <span className="sr-only">Close</span>
+            </button>
           </div>
 
-          {/* Payment Summary */}
-          {selectedInvoice && (
-            <div className="bg-muted/50 rounded-lg p-4 space-y-2 border-2 border-primary/20">
-              <h3 className="font-semibold text-sm text-primary">Payment Summary</h3>
-              <div className="space-y-1.5 text-sm">
-                <div className="flex justify-between">
-                  <span className="text-muted-foreground">Invoice Total:</span>
-                  <span className="font-medium">
-                    {formatCurrency(selectedInvoice.total)}
-                  </span>
-                </div>
-                <div className="flex justify-between">
-                  <span className="text-muted-foreground">Total Paid:</span>
-                  <span className="font-medium text-green-600">
-                    {formatCurrency(totalPaid)}
-                  </span>
-                </div>
-                <div className="border-t pt-1.5 mt-1.5">
-                  <div className="flex justify-between items-center">
-                    <span className="font-semibold">Amount Due:</span>
-                    <span className="font-bold text-lg text-primary">
-                      {formatCurrency(remainingBalance)}
-                    </span>
-                  </div>
-                </div>
+          {/* Scrollable Content */}
+          <form
+            onSubmit={handleSubmit(onSubmit)}
+            className="flex flex-col flex-1 min-h-0"
+          >
+            <div className="overflow-y-auto flex-1 p-6 space-y-4">
+              <div className="space-y-2">
+                <Label htmlFor="invoiceId">Invoice *</Label>
+                <Select id="invoiceId" {...register('invoiceId')}>
+                  <option value="">Select invoice</option>
+                  {invoices?.map((invoice) => (
+                    <option key={invoice.id} value={invoice.id}>
+                      {invoice.invoiceNumber} - {invoice.customer?.name} (
+                      {formatCurrency(invoice.total)})
+                    </option>
+                  ))}
+                </Select>
+                {errors.invoiceId && (
+                  <p className="text-sm text-destructive">{errors.invoiceId.message}</p>
+                )}
               </div>
-              {invoicePayments && invoicePayments.length > 0 && (
-                <div className="mt-3 pt-3 border-t">
-                  <p className="text-xs text-muted-foreground mb-2">
-                    Previous Payments ({invoicePayments.length}):
-                  </p>
-                  <div className="space-y-1 max-h-24 overflow-y-auto">
-                    {invoicePayments.map((payment) => (
-                      <div
-                        key={payment.id}
-                        className="flex justify-between text-xs bg-background/50 rounded px-2 py-1"
-                      >
-                        <span className="text-muted-foreground">
-                          {new Date(payment.paymentDate).toLocaleDateString()}
-                        </span>
-                        <span className="font-medium">
-                          {formatCurrency(payment.amount)}
+
+              {/* Payment Summary */}
+              {selectedInvoice && (
+                <div className="bg-muted/50 rounded-lg p-4 space-y-2 border-2 border-primary/20">
+                  <h3 className="font-semibold text-sm text-primary">Payment Summary</h3>
+                  <div className="space-y-1.5 text-sm">
+                    <div className="flex justify-between">
+                      <span className="text-muted-foreground">Invoice Total:</span>
+                      <span className="font-medium">
+                        {formatCurrency(selectedInvoice.total)}
+                      </span>
+                    </div>
+                    <div className="flex justify-between">
+                      <span className="text-muted-foreground">Total Paid:</span>
+                      <span className="font-medium text-green-600">
+                        {formatCurrency(totalPaid)}
+                      </span>
+                    </div>
+                    <div className="border-t pt-1.5 mt-1.5">
+                      <div className="flex justify-between items-center">
+                        <span className="font-semibold">Amount Due:</span>
+                        <span className="font-bold text-lg text-primary">
+                          {formatCurrency(remainingBalance)}
                         </span>
                       </div>
-                    ))}
+                    </div>
                   </div>
+                  {invoicePayments && invoicePayments.length > 0 && (
+                    <div className="mt-3 pt-3 border-t">
+                      <p className="text-xs text-muted-foreground mb-2">
+                        Previous Payments ({invoicePayments.length}):
+                      </p>
+                      <div className="space-y-1 max-h-24 overflow-y-auto">
+                        {invoicePayments.map((payment) => (
+                          <div
+                            key={payment.id}
+                            className="flex justify-between text-xs bg-background/50 rounded px-2 py-1"
+                          >
+                            <span className="text-muted-foreground">
+                              {new Date(payment.paymentDate).toLocaleDateString()}
+                            </span>
+                            <span className="font-medium">
+                              {formatCurrency(payment.amount)}
+                            </span>
+                          </div>
+                        ))}
+                      </div>
+                    </div>
+                  )}
                 </div>
               )}
+
+              <div className="grid grid-cols-2 gap-4">
+                <div className="space-y-2">
+                  <Label htmlFor="amount">
+                    Payment Amount *
+                    {selectedInvoice && remainingBalance > 0 && (
+                      <span className="text-xs text-muted-foreground ml-1">
+                        (Due: {formatCurrency(remainingBalance)})
+                      </span>
+                    )}
+                  </Label>
+                  <Input
+                    id="amount"
+                    type="number"
+                    step="0.01"
+                    placeholder="0.00"
+                    {...register('amount', { valueAsNumber: true })}
+                  />
+                  {errors.amount && (
+                    <p className="text-sm text-destructive">{errors.amount.message}</p>
+                  )}
+                </div>
+
+                <div className="space-y-2">
+                  <Label htmlFor="paymentDate">Payment Date *</Label>
+                  <Input id="paymentDate" type="date" {...register('paymentDate')} />
+                  {errors.paymentDate && (
+                    <p className="text-sm text-destructive">
+                      {errors.paymentDate.message}
+                    </p>
+                  )}
+                </div>
+              </div>
+
+              <div className="space-y-2">
+                <Label htmlFor="paymentMethod">Payment Method *</Label>
+                <Select id="paymentMethod" {...register('paymentMethod')}>
+                  <option value="CREDIT_CARD">Credit Card</option>
+                  <option value="BANK_TRANSFER">Bank Transfer</option>
+                  <option value="CASH">Cash</option>
+                  <option value="CHECK">Check</option>
+                  <option value="OTHER">Other</option>
+                </Select>
+              </div>
+
+              <div className="space-y-2">
+                <Label htmlFor="transactionId">Transaction ID / Reference</Label>
+                <Input
+                  id="transactionId"
+                  placeholder="Transaction ID or check number"
+                  {...register('transactionId')}
+                />
+              </div>
+
+              <div className="space-y-2">
+                <Label htmlFor="notes">Notes</Label>
+                <Textarea
+                  id="notes"
+                  placeholder="Additional notes"
+                  {...register('notes')}
+                />
+              </div>
             </div>
-          )}
 
-          <div className="grid grid-cols-2 gap-4">
-            <div className="space-y-2">
-              <Label htmlFor="amount">
-                Payment Amount *
-                {selectedInvoice && remainingBalance > 0 && (
-                  <span className="text-xs text-muted-foreground ml-1">
-                    (Due: {formatCurrency(remainingBalance)})
-                  </span>
-                )}
-              </Label>
-              <Input
-                id="amount"
-                type="number"
-                step="0.01"
-                placeholder="0.00"
-                {...register('amount', { valueAsNumber: true })}
-              />
-              {errors.amount && (
-                <p className="text-sm text-destructive">{errors.amount.message}</p>
-              )}
+            {/* Fixed Footer */}
+            <div className="flex justify-end gap-3 p-6 border-t flex-shrink-0">
+              <Button type="button" variant="outline" onClick={() => onOpenChange(false)}>
+                Cancel
+              </Button>
+              <Button type="submit" disabled={mutation.isPending}>
+                {mutation.isPending ? 'Recording...' : 'Record Payment'}
+              </Button>
             </div>
-
-            <div className="space-y-2">
-              <Label htmlFor="paymentDate">Payment Date *</Label>
-              <Input id="paymentDate" type="date" {...register('paymentDate')} />
-              {errors.paymentDate && (
-                <p className="text-sm text-destructive">{errors.paymentDate.message}</p>
-              )}
-            </div>
-          </div>
-
-          <div className="space-y-2">
-            <Label htmlFor="paymentMethod">Payment Method *</Label>
-            <Select id="paymentMethod" {...register('paymentMethod')}>
-              <option value="CREDIT_CARD">Credit Card</option>
-              <option value="BANK_TRANSFER">Bank Transfer</option>
-              <option value="CASH">Cash</option>
-              <option value="CHECK">Check</option>
-              <option value="OTHER">Other</option>
-            </Select>
-          </div>
-
-          <div className="space-y-2">
-            <Label htmlFor="transactionId">Transaction ID / Reference</Label>
-            <Input
-              id="transactionId"
-              placeholder="Transaction ID or check number"
-              {...register('transactionId')}
-            />
-          </div>
-
-          <div className="space-y-2">
-            <Label htmlFor="notes">Notes</Label>
-            <Textarea id="notes" placeholder="Additional notes" {...register('notes')} />
-          </div>
-
-          <div className="flex justify-end gap-3 pt-4">
-            <Button type="button" variant="outline" onClick={() => onOpenChange(false)}>
-              Cancel
-            </Button>
-            <Button type="submit" disabled={mutation.isPending}>
-              {mutation.isPending ? 'Recording...' : 'Record Payment'}
-            </Button>
-          </div>
-        </form>
+          </form>
+        </div>
       </div>
-    </div>
+    </>
   );
 }
