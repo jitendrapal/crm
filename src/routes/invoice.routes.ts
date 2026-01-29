@@ -2,6 +2,7 @@ import { FastifyInstance, FastifyRequest, FastifyReply } from 'fastify';
 import { invoiceService } from '../services/invoice.service';
 import { pdfService } from '../services/pdf.service';
 import { emailService } from '../services/email.service';
+import { reminderService } from '../services/reminder.service';
 import { createInvoiceSchema, updateInvoiceSchema } from '../schemas/invoice.schema';
 import { authenticate, JWTPayload } from '../middleware/auth';
 import prisma from '../lib/prisma';
@@ -230,6 +231,49 @@ export async function invoiceRoutes(fastify: FastifyInstance) {
           invoices: overdueInvoices,
         });
       } catch (error: any) {
+        reply.code(400).send({ error: error.message });
+      }
+    }
+  );
+
+  // Send automated reminders (admin only - for manual testing)
+  fastify.post(
+    '/send-automated-reminders',
+    async (_request: FastifyRequest, reply: FastifyReply) => {
+      try {
+        const result = await reminderService.checkAndSendReminders();
+        reply.send({
+          message: 'Automated reminders processed',
+          ...result,
+        });
+      } catch (error: any) {
+        console.error('Error in manual reminder trigger:', error);
+        reply.code(500).send({ error: error.message });
+      }
+    }
+  );
+
+  // Get reminder history for an invoice
+  fastify.get(
+    '/:id/reminder-history',
+    async (request: FastifyRequest, reply: FastifyReply) => {
+      try {
+        const { id } = request.params as { id: string };
+        const user = request.user as JWTPayload;
+
+        // Verify invoice belongs to tenant
+        const invoice = await prisma.invoice.findFirst({
+          where: { id, tenantId: user.tenantId },
+        });
+
+        if (!invoice) {
+          return reply.code(404).send({ error: 'Invoice not found' });
+        }
+
+        const history = await reminderService.getReminderHistory(id);
+        reply.send({ history });
+      } catch (error: any) {
+        console.error('Error fetching reminder history:', error);
         reply.code(400).send({ error: error.message });
       }
     }

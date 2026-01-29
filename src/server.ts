@@ -4,6 +4,7 @@ import helmet from '@fastify/helmet';
 import jwt from '@fastify/jwt';
 import rateLimit from '@fastify/rate-limit';
 import multipart from '@fastify/multipart';
+import cron from 'node-cron';
 import { config } from './config/env';
 import { authRoutes } from './routes/auth.routes';
 import { customerRoutes } from './routes/customer.routes';
@@ -15,6 +16,7 @@ import { dashboardRoutes } from './routes/dashboard.routes';
 import { seedRoutes } from './routes/seed.routes';
 import { userRoutes } from './routes/user.routes';
 import { tenantRoutes } from './routes/tenant.routes';
+import { reminderService } from './services/reminder.service';
 
 const fastify = Fastify({
   logger: {
@@ -103,11 +105,11 @@ async function start() {
 
     console.log(`
     🚀 Server is running!
-    
+
     📍 URL: http://${config.host}:${config.port}
     🌍 Environment: ${config.nodeEnv}
     📊 Health: http://${config.host}:${config.port}/health
-    
+
     API Endpoints:
     - POST   /api/auth/register
     - POST   /api/auth/login
@@ -120,6 +122,21 @@ async function start() {
     - POST   /api/payments
     - POST   /api/webhooks/stripe
     `);
+
+    // Set up automated reminder cron job (runs daily at 9:00 AM)
+    cron.schedule('0 9 * * *', async () => {
+      console.log('🔔 Running automated reminder check...');
+      try {
+        const result = await reminderService.checkAndSendReminders();
+        console.log(
+          `✅ Reminder check complete: ${result.checked} checked, ${result.sent} sent, ${result.errors} errors`
+        );
+      } catch (error) {
+        console.error('❌ Error in reminder cron job:', error);
+      }
+    });
+
+    console.log('⏰ Automated reminder cron job scheduled (daily at 9:00 AM)');
   } catch (err) {
     console.error('Error starting server:', err);
     process.exit(1);

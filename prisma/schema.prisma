@@ -95,6 +95,7 @@ model Invoice {
   customer Customer       @relation(fields: [customerId], references: [id], onDelete: Restrict)
   items    InvoiceItem[]
   payments Payment[]
+  reminderLogs ReminderLog[]
 
   @@index([tenantId])
   @@index([customerId])
@@ -105,6 +106,20 @@ model Invoice {
 
 // InvoiceStatus enum removed - using String instead for SQLite compatibility
 // Valid values: "DRAFT", "SENT", "PAID", "OVERDUE", "CANCELLED"
+
+model ReminderLog {
+  id           String   @id @default(uuid())
+  invoiceId    String
+  reminderType String   // BEFORE_DUE, ON_DUE, OVERDUE_3, OVERDUE_7, OVERDUE_14
+  sentAt       DateTime @default(now())
+  createdAt    DateTime @default(now())
+
+  invoice Invoice @relation(fields: [invoiceId], references: [id], onDelete: Cascade)
+
+  @@index([invoiceId])
+  @@index([reminderType])
+  @@map("reminder_logs")
+}
 
 model InvoiceItem {
   id          String   @id @default(uuid())

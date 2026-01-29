@@ -1,7 +1,7 @@
 import { useParams, useNavigate } from 'react-router-dom';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { toast } from 'sonner';
-import { Download, Send, Edit, Bell } from 'lucide-react';
+import { Download, Send, Edit, Bell, Clock } from 'lucide-react';
 import { Header } from '@/components/layout/Header';
 import { Button } from '@/components/ui/Button';
 import { Badge } from '@/components/ui/Badge';
@@ -25,6 +25,17 @@ export function InvoiceDetailPage() {
     },
   });
 
+  const { data: reminderHistory } = useQuery({
+    queryKey: ['reminder-history', id],
+    queryFn: async () => {
+      const response = await api.get<{ history: any[] }>(
+        `/invoices/${id}/reminder-history`
+      );
+      return response.data.history;
+    },
+    enabled: !!id,
+  });
+
   const sendMutation = useMutation({
     mutationFn: () => api.post(`/invoices/${id}/send`),
     onSuccess: () => {
@@ -39,6 +50,7 @@ export function InvoiceDetailPage() {
   const reminderMutation = useMutation({
     mutationFn: () => api.post(`/invoices/${id}/remind`),
     onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ['reminder-history', id] });
       toast.success('Payment reminder sent successfully');
     },
     onError: (error: any) => {
@@ -231,6 +243,44 @@ export function InvoiceDetailPage() {
               </CardHeader>
               <CardContent>
                 <p className="text-sm text-muted-foreground">{invoice.notes}</p>
+              </CardContent>
+            </Card>
+          )}
+
+          {/* Reminder History */}
+          {reminderHistory && reminderHistory.length > 0 && (
+            <Card>
+              <CardHeader>
+                <CardTitle className="flex items-center gap-2">
+                  <Clock className="h-5 w-5" />
+                  Reminder History
+                </CardTitle>
+              </CardHeader>
+              <CardContent>
+                <div className="space-y-3">
+                  {reminderHistory.map((reminder: any) => (
+                    <div
+                      key={reminder.id}
+                      className="flex items-center justify-between py-2 border-b last:border-0"
+                    >
+                      <div>
+                        <p className="font-medium text-sm">
+                          {reminder.reminderType === 'BEFORE_DUE' && '7 days before due'}
+                          {reminder.reminderType === 'ON_DUE' && 'On due date'}
+                          {reminder.reminderType === 'OVERDUE_3' && '3 days overdue'}
+                          {reminder.reminderType === 'OVERDUE_7' && '7 days overdue'}
+                          {reminder.reminderType === 'OVERDUE_14' && '14 days overdue'}
+                        </p>
+                        <p className="text-xs text-muted-foreground">
+                          Sent on {formatDate(reminder.sentAt)}
+                        </p>
+                      </div>
+                      <Badge variant="outline" className="text-xs">
+                        Sent
+                      </Badge>
+                    </div>
+                  ))}
+                </div>
               </CardContent>
             </Card>
           )}
