@@ -10,6 +10,7 @@ import { Select } from '@/components/ui/Select';
 import { Textarea } from '@/components/ui/Textarea';
 import api from '@/lib/api';
 import { Invoice, PaymentMethod } from '@/types';
+import { useCurrency } from '@/hooks/useCurrency';
 
 const paymentSchema = z.object({
   invoiceId: z.string().min(1, 'Invoice is required'),
@@ -29,6 +30,7 @@ interface RecordPaymentDialogProps {
 
 export function RecordPaymentDialog({ open, onOpenChange }: RecordPaymentDialogProps) {
   const queryClient = useQueryClient();
+  const { formatCurrency } = useCurrency();
 
   const { data: invoices } = useQuery({
     queryKey: ['unpaid-invoices'],
@@ -99,7 +101,8 @@ export function RecordPaymentDialog({ open, onOpenChange }: RecordPaymentDialogP
               <option value="">Select invoice</option>
               {invoices?.map((invoice) => (
                 <option key={invoice.id} value={invoice.id}>
-                  {invoice.invoiceNumber} - {invoice.customer?.name} (${invoice.total})
+                  {invoice.invoiceNumber} - {invoice.customer?.name} (
+                  {formatCurrency(invoice.total)})
                 </option>
               ))}
             </Select>

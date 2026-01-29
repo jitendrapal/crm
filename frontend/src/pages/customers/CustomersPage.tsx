@@ -7,11 +7,14 @@ import { Button } from '@/components/ui/Button';
 import { Card, CardContent } from '@/components/ui/Card';
 import { Input } from '@/components/ui/Input';
 import { CreateCustomerDialog } from './CreateCustomerDialog';
+import { EditCustomerDialog } from './EditCustomerDialog';
 import api from '@/lib/api';
 import { Customer, PaginatedResponse } from '@/types';
 
 export function CustomersPage() {
   const [isCreateOpen, setIsCreateOpen] = useState(false);
+  const [isEditOpen, setIsEditOpen] = useState(false);
+  const [selectedCustomer, setSelectedCustomer] = useState<Customer | null>(null);
   const [page, setPage] = useState(1);
   const [searchQuery, setSearchQuery] = useState('');
   const [city, setCity] = useState('');
@@ -67,6 +70,11 @@ export function CustomersPage() {
     if (confirm(`Are you sure you want to delete ${name}?`)) {
       deleteMutation.mutate(id);
     }
+  };
+
+  const handleEdit = (customer: Customer) => {
+    setSelectedCustomer(customer);
+    setIsEditOpen(true);
   };
 
   return (
@@ -173,7 +181,12 @@ export function CustomersPage() {
                       </p>
                     </div>
                     <div className="flex gap-1 flex-shrink-0">
-                      <Button variant="ghost" size="icon" title="Edit">
+                      <Button
+                        variant="ghost"
+                        size="icon"
+                        onClick={() => handleEdit(customer)}
+                        title="Edit"
+                      >
                         <Edit className="h-4 w-4" />
                       </Button>
                       <Button
@@ -238,6 +251,11 @@ export function CustomersPage() {
       </div>
 
       <CreateCustomerDialog open={isCreateOpen} onOpenChange={setIsCreateOpen} />
+      <EditCustomerDialog
+        open={isEditOpen}
+        onOpenChange={setIsEditOpen}
+        customer={selectedCustomer}
+      />
     </div>
   );
 }
