@@ -62,7 +62,12 @@ export function CustomersPage() {
       toast.success('Customer deleted successfully');
     },
     onError: (error: any) => {
-      toast.error(error.response?.data?.message || 'Failed to delete customer');
+      const errorMessage =
+        error.response?.data?.error ||
+        error.response?.data?.message ||
+        'Failed to delete customer';
+      toast.error(errorMessage);
+      console.error('Delete customer error:', error.response?.data);
     },
   });
 
