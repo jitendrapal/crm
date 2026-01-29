@@ -58,6 +58,18 @@ export interface Customer {
   updatedAt: string;
 }
 
+export interface Product {
+  id: string;
+  name: string;
+  description?: string;
+  price: number;
+  unit: string;
+  isActive: boolean;
+  tenantId: string;
+  createdAt: string;
+  updatedAt: string;
+}
+
 export interface InvoiceItem {
   id: string;
   description: string;

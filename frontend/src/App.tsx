@@ -10,6 +10,7 @@ import { RegisterPage } from './pages/auth/RegisterPage';
 import { DashboardPage } from './pages/dashboard/DashboardPage';
 import { CustomersPage } from './pages/customers/CustomersPage';
 import { CustomerDetailPage } from './pages/customers/CustomerDetailPage';
+import { ProductsPage } from './pages/products/ProductsPage';
 import { InvoicesPage } from './pages/invoices/InvoicesPage';
 import { InvoiceDetailPage } from './pages/invoices/InvoiceDetailPage';
 import { CreateInvoicePage } from './pages/invoices/CreateInvoicePage';
@@ -44,6 +45,7 @@ function App() {
           <Route path="dashboard" element={<DashboardPage />} />
           <Route path="customers" element={<CustomersPage />} />
           <Route path="customers/:id" element={<CustomerDetailPage />} />
+          <Route path="products" element={<ProductsPage />} />
           <Route path="invoices" element={<InvoicesPage />} />
           <Route path="invoices/new" element={<CreateInvoicePage />} />
           <Route path="invoices/:id/edit" element={<EditInvoicePage />} />

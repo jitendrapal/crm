@@ -5,6 +5,7 @@ import {
   Users,
   FileText,
   CreditCard,
+  Package,
   Settings,
   LogOut,
   Menu,
@@ -16,6 +17,7 @@ import { useAuthStore } from '@/store/auth';
 const navigation = [
   { name: 'Dashboard', href: '/dashboard', icon: LayoutDashboard },
   { name: 'Customers', href: '/customers', icon: Users },
+  { name: 'Products', href: '/products', icon: Package },
   { name: 'Invoices', href: '/invoices', icon: FileText },
   { name: 'Payments', href: '/payments', icon: CreditCard },
   { name: 'Settings', href: '/settings', icon: Settings },

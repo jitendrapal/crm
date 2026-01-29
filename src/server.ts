@@ -9,6 +9,7 @@ import { authRoutes } from './routes/auth.routes';
 import { customerRoutes } from './routes/customer.routes';
 import { invoiceRoutes } from './routes/invoice.routes';
 import { paymentRoutes } from './routes/payment.routes';
+import { productRoutes } from './routes/product.routes';
 import { webhookRoutes } from './routes/webhook.routes';
 import { dashboardRoutes } from './routes/dashboard.routes';
 import { seedRoutes } from './routes/seed.routes';
@@ -58,6 +59,7 @@ async function buildServer() {
   await fastify.register(customerRoutes, { prefix: '/api/customers' });
   await fastify.register(invoiceRoutes, { prefix: '/api/invoices' });
   await fastify.register(paymentRoutes, { prefix: '/api/payments' });
+  await fastify.register(productRoutes, { prefix: '/api/products' });
   await fastify.register(webhookRoutes, { prefix: '/api/webhooks' });
   await fastify.register(userRoutes, { prefix: '/api/users' });
   await fastify.register(tenantRoutes, { prefix: '/api/tenants' });

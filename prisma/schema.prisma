@@ -26,6 +26,7 @@ model Tenant {
   customers Customer[]
   invoices  Invoice[]
   payments  Payment[]
+  products  Product[]
 
   @@map("tenants")
 }
@@ -145,4 +146,22 @@ model Payment {
 
 // PaymentMethod enum removed - using String instead for SQLite compatibility
 // Valid values: "CREDIT_CARD", "BANK_TRANSFER", "CASH", "CHECK", "STRIPE", "OTHER"
+
+model Product {
+  id          String   @id @default(uuid())
+  name        String
+  description String?
+  price       Float
+  unit        String   @default("item") // item, hour, day, month, etc.
+  isActive    Boolean  @default(true)
+  tenantId    String
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+
+  tenant Tenant @relation(fields: [tenantId], references: [id], onDelete: Cascade)
+
+  @@index([tenantId])
+  @@index([isActive])
+  @@map("products")
+}
 
