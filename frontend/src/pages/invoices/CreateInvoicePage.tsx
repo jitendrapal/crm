@@ -13,7 +13,7 @@ import { Select } from '@/components/ui/Select';
 import { Textarea } from '@/components/ui/Textarea';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/Card';
 import api from '@/lib/api';
-import { Customer } from '@/types';
+import { Customer, Product } from '@/types';
 import { useCurrency } from '@/hooks/useCurrency';
 
 const invoiceSchema = z.object({
@@ -48,11 +48,20 @@ export function CreateInvoicePage() {
     },
   });
 
+  const { data: products } = useQuery({
+    queryKey: ['products-active'],
+    queryFn: async () => {
+      const response = await api.get<{ data: Product[] }>('/products/active');
+      return response.data.data;
+    },
+  });
+
   const {
     register,
     control,
     handleSubmit,
     watch,
+    setValue,
     formState: { errors },
   } = useForm<InvoiceForm>({
     resolver: zodResolver(invoiceSchema),
@@ -67,6 +76,16 @@ export function CreateInvoicePage() {
     control,
     name: 'items',
   });
+
+  const handleProductSelect = (index: number, productId: string) => {
+    if (!productId) return;
+
+    const product = products?.find((p) => p.id === productId);
+    if (product) {
+      setValue(`items.${index}.description`, product.name);
+      setValue(`items.${index}.unitPrice`, product.price);
+    }
+  };
 
   const mutation = useMutation({
     mutationFn: (data: InvoiceForm) => api.post('/invoices', data),
@@ -168,9 +187,20 @@ export function CreateInvoicePage() {
                   className="grid grid-cols-1 md:grid-cols-12 gap-4 items-start p-4 md:p-0 border md:border-0 rounded-lg md:rounded-none"
                 >
                   <div className="md:col-span-5 space-y-2">
-                    <Label>Description</Label>
+                    <Label>Product/Service</Label>
+                    <Select
+                      onChange={(e) => handleProductSelect(index, e.target.value)}
+                      className="mb-2"
+                    >
+                      <option value="">Select a product or enter custom...</option>
+                      {products?.map((product) => (
+                        <option key={product.id} value={product.id}>
+                          {product.name} - {formatCurrency(product.price)}/{product.unit}
+                        </option>
+                      ))}
+                    </Select>
                     <Input
-                      placeholder="Service or product description"
+                      placeholder="Or enter custom description"
                       {...register(`items.${index}.description`)}
                     />
                   </div>
