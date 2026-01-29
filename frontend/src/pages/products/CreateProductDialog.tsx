@@ -43,8 +43,9 @@ export function CreateProductDialog({ open, onOpenChange }: CreateProductDialogP
 
   const mutation = useMutation({
     mutationFn: (data: ProductForm) => api.post('/products', data),
-    onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ['products'] });
+    onSuccess: async () => {
+      await queryClient.invalidateQueries({ queryKey: ['products'] });
+      await queryClient.refetchQueries({ queryKey: ['products'] });
       toast.success('Product created successfully');
       reset();
       onOpenChange(false);

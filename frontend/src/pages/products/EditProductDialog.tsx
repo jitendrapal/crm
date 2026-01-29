@@ -28,7 +28,11 @@ interface EditProductDialogProps {
   product: Product | null;
 }
 
-export function EditProductDialog({ open, onOpenChange, product }: EditProductDialogProps) {
+export function EditProductDialog({
+  open,
+  onOpenChange,
+  product,
+}: EditProductDialogProps) {
   const queryClient = useQueryClient();
 
   const {
@@ -54,8 +58,9 @@ export function EditProductDialog({ open, onOpenChange, product }: EditProductDi
 
   const mutation = useMutation({
     mutationFn: (data: ProductForm) => api.put(`/products/${product?.id}`, data),
-    onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ['products'] });
+    onSuccess: async () => {
+      await queryClient.invalidateQueries({ queryKey: ['products'] });
+      await queryClient.refetchQueries({ queryKey: ['products'] });
       toast.success(`Product "${product?.name}" updated successfully`);
       onOpenChange(false);
     },
@@ -167,4 +172,3 @@ export function EditProductDialog({ open, onOpenChange, product }: EditProductDi
     </>
   );
 }
-
