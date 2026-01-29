@@ -1,4 +1,3 @@
-import * as React from 'react';
 import { Button } from './Button';
 import { X } from 'lucide-react';
 
@@ -70,11 +69,7 @@ export function ConfirmDialog({
             >
               {cancelText}
             </Button>
-            <Button
-              variant={variant}
-              onClick={handleConfirm}
-              disabled={isLoading}
-            >
+            <Button variant={variant} onClick={handleConfirm} disabled={isLoading}>
               {isLoading ? 'Processing...' : confirmText}
             </Button>
           </div>
@@ -83,4 +78,3 @@ export function ConfirmDialog({
     </>
   );
 }
-
