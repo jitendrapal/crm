@@ -1,6 +1,7 @@
 import { FastifyInstance } from 'fastify';
 import { z } from 'zod';
 import { productService } from '../services/product.service';
+import { authenticate } from '../middleware/auth';
 
 const createProductSchema = z.object({
   name: z.string().min(1, 'Name is required'),
@@ -20,12 +21,24 @@ const updateProductSchema = z.object({
 
 const querySchema = z.object({
   search: z.string().optional(),
-  isActive: z.string().optional().transform((val) => val === 'true'),
-  page: z.string().optional().transform((val) => (val ? parseInt(val, 10) : 1)),
-  limit: z.string().optional().transform((val) => (val ? parseInt(val, 10) : 50)),
+  isActive: z
+    .string()
+    .optional()
+    .transform((val) => val === 'true'),
+  page: z
+    .string()
+    .optional()
+    .transform((val) => (val ? parseInt(val, 10) : 1)),
+  limit: z
+    .string()
+    .optional()
+    .transform((val) => (val ? parseInt(val, 10) : 50)),
 });
 
 export async function productRoutes(fastify: FastifyInstance) {
+  // All routes require authentication
+  fastify.addHook('onRequest', authenticate);
+
   // Get all products
   fastify.get('/', async (request, reply) => {
     try {
@@ -120,4 +133,3 @@ export async function productRoutes(fastify: FastifyInstance) {
     }
   });
 }
-
