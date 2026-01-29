@@ -86,7 +86,6 @@ export class EmailService {
    */
   async sendPasswordReset(
     user: { email: string; firstName: string; lastName: string },
-    resetToken: string,
     resetUrl: string
   ): Promise<{ success: boolean; messageId?: string; error?: string }> {
     try {

@@ -114,7 +114,7 @@ export async function authRoutes(fastify: FastifyInstance) {
         const frontendUrl = config.frontendUrl || 'http://localhost:5173';
         const resetUrl = `${frontendUrl}/reset-password?token=${result.resetToken}`;
 
-        await emailService.sendPasswordReset(result.user, result.resetToken, resetUrl);
+        await emailService.sendPasswordReset(result.user, resetUrl);
       }
 
       // Always return success to prevent email enumeration
