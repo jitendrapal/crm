@@ -2,10 +2,21 @@ import { FastifyInstance, FastifyRequest, FastifyReply } from 'fastify';
 import { authService } from '../services/auth.service';
 import { registerSchema, loginSchema } from '../schemas/auth.schema';
 import { authenticate, JWTPayload } from '../middleware/auth';
+import { emailService } from '../services/email.service';
+import { config } from '../config/env';
 import { z } from 'zod';
 
 const changePasswordSchema = z.object({
   currentPassword: z.string(),
+  newPassword: z.string().min(6),
+});
+
+const forgotPasswordSchema = z.object({
+  email: z.string().email(),
+});
+
+const resetPasswordSchema = z.object({
+  token: z.string(),
   newPassword: z.string().min(6),
 });
 
@@ -91,4 +102,37 @@ export async function authRoutes(fastify: FastifyInstance) {
       }
     }
   );
+
+  // Forgot password - request reset
+  fastify.post('/forgot-password', async (request, reply) => {
+    try {
+      const data = forgotPasswordSchema.parse(request.body);
+      const result = await authService.requestPasswordReset(data.email);
+
+      // If user exists, send email
+      if (result.resetToken && result.user) {
+        const frontendUrl = config.frontendUrl || 'http://localhost:5173';
+        const resetUrl = `${frontendUrl}/reset-password?token=${result.resetToken}`;
+
+        await emailService.sendPasswordReset(result.user, result.resetToken, resetUrl);
+      }
+
+      // Always return success to prevent email enumeration
+      reply.send({ message: result.message });
+    } catch (error: any) {
+      console.error('Forgot password error:', error);
+      reply.code(400).send({ error: error.message });
+    }
+  });
+
+  // Reset password with token
+  fastify.post('/reset-password', async (request, reply) => {
+    try {
+      const data = resetPasswordSchema.parse(request.body);
+      await authService.resetPassword(data.token, data.newPassword);
+      reply.send({ message: 'Password reset successfully' });
+    } catch (error: any) {
+      reply.code(400).send({ error: error.message });
+    }
+  });
 }

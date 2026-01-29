@@ -82,6 +82,37 @@ export class EmailService {
   }
 
   /**
+   * Send password reset email
+   */
+  async sendPasswordReset(
+    user: { email: string; firstName: string; lastName: string },
+    resetToken: string,
+    resetUrl: string
+  ): Promise<{ success: boolean; messageId?: string; error?: string }> {
+    try {
+      const template = this.getPasswordResetTemplate(user, resetUrl);
+
+      const result = await this.resend.emails.send({
+        from: `${this.companyName} <${this.fromEmail}>`,
+        to: user.email,
+        subject: `Reset Your Password - ${this.companyName}`,
+        html: template,
+      });
+
+      if (result.error) {
+        console.error('Resend error:', result.error);
+        return { success: false, error: result.error.message };
+      }
+
+      console.log('Password reset email sent successfully:', result.data?.id);
+      return { success: true, messageId: result.data?.id };
+    } catch (error: any) {
+      console.error('Failed to send password reset email:', error);
+      return { success: false, error: error.message };
+    }
+  }
+
+  /**
    * Get invoice email HTML template
    */
   private getInvoiceEmailTemplate(invoice: any, customer: any): string {
@@ -295,6 +326,100 @@ export class EmailService {
             <td style="background-color: #f8f9fa; padding: 20px 30px; text-align: center; border-top: 1px solid #e9ecef;">
               <p style="margin: 0; font-size: 12px; color: #999999;">
                 This is an automated email. Please do not reply directly to this message.
+              </p>
+            </td>
+          </tr>
+        </table>
+      </td>
+    </tr>
+  </table>
+</body>
+</html>
+    `.trim();
+  }
+
+  /**
+   * Get password reset email HTML template
+   */
+  private getPasswordResetTemplate(
+    user: { firstName: string; lastName: string },
+    resetUrl: string
+  ): string {
+    return `
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Reset Your Password</title>
+</head>
+<body style="margin: 0; padding: 0; font-family: Arial, sans-serif; background-color: #f4f4f4;">
+  <table width="100%" cellpadding="0" cellspacing="0" style="background-color: #f4f4f4; padding: 20px;">
+    <tr>
+      <td align="center">
+        <table width="600" cellpadding="0" cellspacing="0" style="background-color: #ffffff; border-radius: 8px; overflow: hidden; box-shadow: 0 2px 4px rgba(0,0,0,0.1);">
+          <!-- Header -->
+          <tr>
+            <td style="background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); padding: 40px 30px; text-align: center;">
+              <h1 style="margin: 0; color: #ffffff; font-size: 28px; font-weight: bold;">Reset Your Password</h1>
+              <p style="margin: 10px 0 0 0; color: #ffffff; font-size: 16px; opacity: 0.9;">${this.companyName}</p>
+            </td>
+          </tr>
+
+          <!-- Content -->
+          <tr>
+            <td style="padding: 40px 30px;">
+              <p style="margin: 0 0 20px 0; font-size: 16px; color: #333333;">Hi ${user.firstName},</p>
+
+              <p style="margin: 0 0 30px 0; font-size: 16px; color: #666666; line-height: 1.6;">
+                We received a request to reset your password for your ${this.companyName} account. Click the button below to create a new password:
+              </p>
+
+              <!-- Reset Button -->
+              <table width="100%" cellpadding="0" cellspacing="0" style="margin-bottom: 30px;">
+                <tr>
+                  <td align="center">
+                    <a href="${resetUrl}" style="display: inline-block; padding: 16px 40px; background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); color: #ffffff; text-decoration: none; border-radius: 6px; font-size: 16px; font-weight: bold; box-shadow: 0 4px 6px rgba(102, 126, 234, 0.3);">
+                      Reset Password
+                    </a>
+                  </td>
+                </tr>
+              </table>
+
+              <!-- Security Info Box -->
+              <table width="100%" cellpadding="0" cellspacing="0" style="background-color: #fff3cd; border-left: 4px solid #ffc107; padding: 15px; margin-bottom: 30px; border-radius: 4px;">
+                <tr>
+                  <td>
+                    <p style="margin: 0 0 10px 0; font-size: 14px; color: #856404; font-weight: bold;">🔒 Security Information</p>
+                    <p style="margin: 0; font-size: 14px; color: #856404; line-height: 1.6;">
+                      This link will expire in <strong>1 hour</strong> for security reasons. If you didn't request this password reset, you can safely ignore this email.
+                    </p>
+                  </td>
+                </tr>
+              </table>
+
+              <p style="margin: 0 0 10px 0; font-size: 14px; color: #999999; line-height: 1.6;">
+                If the button doesn't work, copy and paste this link into your browser:
+              </p>
+              <p style="margin: 0 0 30px 0; font-size: 12px; color: #667eea; word-break: break-all;">
+                ${resetUrl}
+              </p>
+
+              <p style="margin: 0; font-size: 16px; color: #333333;">
+                Best regards,<br>
+                <strong>${this.companyName} Team</strong>
+              </p>
+            </td>
+          </tr>
+
+          <!-- Footer -->
+          <tr>
+            <td style="background-color: #f8f9fa; padding: 20px 30px; text-align: center; border-top: 1px solid #e9ecef;">
+              <p style="margin: 0 0 10px 0; font-size: 12px; color: #999999;">
+                This is an automated email. Please do not reply directly to this message.
+              </p>
+              <p style="margin: 0; font-size: 12px; color: #999999;">
+                Need help? Contact us at <a href="mailto:support@inyic.com" style="color: #667eea; text-decoration: none;">support@inyic.com</a>
               </p>
             </td>
           </tr>

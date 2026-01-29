@@ -27,6 +27,7 @@ export const config = {
 
   // CORS
   corsOrigin: process.env.CORS_ORIGIN || '*',
+  frontendUrl: process.env.FRONTEND_URL || 'http://localhost:5173',
 
   // Rate Limiting
   rateLimitMax: parseInt(process.env.RATE_LIMIT_MAX || '100', 10),
