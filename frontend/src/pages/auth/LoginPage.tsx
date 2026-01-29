@@ -4,16 +4,7 @@ import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { z } from 'zod';
 import { toast } from 'sonner';
-import {
-  FileText,
-  Mail,
-  Lock,
-  ArrowRight,
-  CheckCircle2,
-  TrendingUp,
-  Users,
-  Zap,
-} from 'lucide-react';
+import { FileText, Mail, Lock, ArrowRight, Users, DollarSign, Bell } from 'lucide-react';
 import { Button } from '@/components/ui/Button';
 import { Input } from '@/components/ui/Input';
 import { Label } from '@/components/ui/Label';
@@ -64,7 +55,92 @@ export function LoginPage() {
 
   return (
     <div className="flex min-h-screen">
-      {/* Left Side - Login Form */}
+      {/* Left Side - Feature Showcase */}
+      <div className="relative hidden lg:flex lg:flex-1 bg-gradient-to-br from-blue-600 via-indigo-600 to-purple-700">
+        <div className="absolute inset-0 bg-grid-white/[0.05] bg-[size:20px_20px]" />
+        <div className="relative flex flex-col justify-center px-12 xl:px-16 text-white">
+          <div className="max-w-md">
+            <div className="mb-8">
+              <div className="inline-flex h-20 w-20 items-center justify-center rounded-2xl bg-white/10 backdrop-blur-sm mb-6">
+                <FileText className="h-10 w-10" />
+              </div>
+            </div>
+
+            <h2 className="text-4xl font-bold mb-4">Professional Invoice Management</h2>
+            <p className="text-lg text-blue-100 mb-12">
+              Create, send, and track invoices with ease. Get paid faster with automated
+              reminders and real-time analytics.
+            </p>
+
+            {/* Features */}
+            <div className="space-y-4 mb-12">
+              <div className="flex items-center gap-3">
+                <div className="flex h-10 w-10 items-center justify-center rounded-lg bg-white/10 backdrop-blur-sm">
+                  <FileText className="h-5 w-5" />
+                </div>
+                <div>
+                  <h3 className="font-semibold">Create Beautiful Invoices</h3>
+                  <p className="text-sm text-blue-100">
+                    Professional PDF invoices in seconds
+                  </p>
+                </div>
+              </div>
+
+              <div className="flex items-center gap-3">
+                <div className="flex h-10 w-10 items-center justify-center rounded-lg bg-white/10 backdrop-blur-sm">
+                  <DollarSign className="h-5 w-5" />
+                </div>
+                <div>
+                  <h3 className="font-semibold">Track Payments</h3>
+                  <p className="text-sm text-blue-100">
+                    Monitor payment status in real-time
+                  </p>
+                </div>
+              </div>
+
+              <div className="flex items-center gap-3">
+                <div className="flex h-10 w-10 items-center justify-center rounded-lg bg-white/10 backdrop-blur-sm">
+                  <Users className="h-5 w-5" />
+                </div>
+                <div>
+                  <h3 className="font-semibold">Manage Customers</h3>
+                  <p className="text-sm text-blue-100">
+                    Keep all customer data organized
+                  </p>
+                </div>
+              </div>
+
+              <div className="flex items-center gap-3">
+                <div className="flex h-10 w-10 items-center justify-center rounded-lg bg-white/10 backdrop-blur-sm">
+                  <Bell className="h-5 w-5" />
+                </div>
+                <div>
+                  <h3 className="font-semibold">Automated Reminders</h3>
+                  <p className="text-sm text-blue-100">Never miss a payment deadline</p>
+                </div>
+              </div>
+            </div>
+
+            {/* Stats */}
+            <div className="grid grid-cols-3 gap-6 pt-8 border-t border-white/20">
+              <div>
+                <div className="text-3xl font-bold">10K+</div>
+                <div className="text-sm text-blue-100">Invoices Created</div>
+              </div>
+              <div>
+                <div className="text-3xl font-bold">500+</div>
+                <div className="text-sm text-blue-100">Happy Users</div>
+              </div>
+              <div>
+                <div className="text-3xl font-bold">99.9%</div>
+                <div className="text-sm text-blue-100">Uptime</div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      {/* Right Side - Login Form */}
       <div className="flex flex-1 flex-col justify-center px-4 py-12 sm:px-6 lg:flex-none lg:px-20 xl:px-24 bg-background">
         <div className="mx-auto w-full max-w-sm lg:w-96">
           {/* Logo and Brand */}
@@ -180,90 +256,6 @@ export function LoginPage() {
               >
                 Create a free account
               </Link>
-            </div>
-          </div>
-        </div>
-      </div>
-
-      {/* Right Side - Feature Showcase */}
-      <div className="relative hidden lg:flex lg:flex-1 bg-gradient-to-br from-blue-600 via-indigo-600 to-purple-700">
-        {/* Decorative Background Pattern */}
-        <div className="absolute inset-0 bg-grid-white/[0.05] bg-[size:20px_20px]" />
-
-        <div className="relative flex flex-col justify-center px-12 xl:px-16 text-white">
-          {/* Main Heading */}
-          <div className="mb-12">
-            <h2 className="text-4xl font-bold mb-4">Streamline Your Invoicing</h2>
-            <p className="text-lg text-blue-100">
-              Professional invoice management made simple and efficient
-            </p>
-          </div>
-
-          {/* Features List */}
-          <div className="space-y-6">
-            <div className="flex items-start gap-4">
-              <div className="flex h-10 w-10 items-center justify-center rounded-lg bg-white/10 backdrop-blur-sm">
-                <CheckCircle2 className="h-5 w-5" />
-              </div>
-              <div>
-                <h3 className="font-semibold text-lg mb-1">Create Beautiful Invoices</h3>
-                <p className="text-blue-100">
-                  Generate professional PDF invoices in seconds with customizable
-                  templates
-                </p>
-              </div>
-            </div>
-
-            <div className="flex items-start gap-4">
-              <div className="flex h-10 w-10 items-center justify-center rounded-lg bg-white/10 backdrop-blur-sm">
-                <TrendingUp className="h-5 w-5" />
-              </div>
-              <div>
-                <h3 className="font-semibold text-lg mb-1">Track Payments</h3>
-                <p className="text-blue-100">
-                  Monitor payment status and get real-time insights into your cash flow
-                </p>
-              </div>
-            </div>
-
-            <div className="flex items-start gap-4">
-              <div className="flex h-10 w-10 items-center justify-center rounded-lg bg-white/10 backdrop-blur-sm">
-                <Users className="h-5 w-5" />
-              </div>
-              <div>
-                <h3 className="font-semibold text-lg mb-1">Manage Customers</h3>
-                <p className="text-blue-100">
-                  Keep all your customer information organized in one place
-                </p>
-              </div>
-            </div>
-
-            <div className="flex items-start gap-4">
-              <div className="flex h-10 w-10 items-center justify-center rounded-lg bg-white/10 backdrop-blur-sm">
-                <Zap className="h-5 w-5" />
-              </div>
-              <div>
-                <h3 className="font-semibold text-lg mb-1">Automated Reminders</h3>
-                <p className="text-blue-100">
-                  Never miss a payment with automated email reminders
-                </p>
-              </div>
-            </div>
-          </div>
-
-          {/* Stats */}
-          <div className="mt-12 grid grid-cols-3 gap-8">
-            <div>
-              <div className="text-3xl font-bold">10K+</div>
-              <div className="text-sm text-blue-100">Invoices Created</div>
-            </div>
-            <div>
-              <div className="text-3xl font-bold">500+</div>
-              <div className="text-sm text-blue-100">Happy Users</div>
-            </div>
-            <div>
-              <div className="text-3xl font-bold">99.9%</div>
-              <div className="text-sm text-blue-100">Uptime</div>
             </div>
           </div>
         </div>

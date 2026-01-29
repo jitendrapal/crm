@@ -79,10 +79,10 @@ export function RegisterPage() {
   };
 
   return (
-    <div className="flex min-h-screen bg-background">
-      {/* Left Side - Registration Form */}
-      <div className="flex flex-1 flex-col justify-center px-4 py-12 sm:px-6 lg:px-20 xl:px-24 overflow-y-auto">
-        <div className="mx-auto w-full max-w-xl">
+    <div className="flex min-h-screen bg-background items-center justify-center">
+      {/* Registration Form */}
+      <div className="w-full max-w-2xl px-4 py-12 sm:px-6 lg:px-8 overflow-y-auto">
+        <div className="mx-auto w-full">
           {/* Logo and Brand */}
           <div className="flex items-center gap-3 mb-8">
             <div className="flex h-12 w-12 items-center justify-center rounded-xl bg-gradient-to-br from-blue-600 to-indigo-600 shadow-lg">
@@ -332,50 +332,6 @@ export function RegisterPage() {
               >
                 Sign in instead
               </Link>
-            </div>
-          </div>
-        </div>
-      </div>
-
-      {/* Right Side - Gradient Background with Pattern */}
-      <div className="relative hidden lg:flex lg:w-1/3 bg-gradient-to-br from-blue-600 via-indigo-600 to-purple-700">
-        <div className="absolute inset-0 bg-grid-white/[0.05] bg-[size:20px_20px]" />
-        <div className="relative flex items-center justify-center p-12">
-          <div className="text-white text-center">
-            <div className="mb-6">
-              <div className="inline-flex h-20 w-20 items-center justify-center rounded-2xl bg-white/10 backdrop-blur-sm mb-4">
-                <FileText className="h-10 w-10" />
-              </div>
-            </div>
-            <h2 className="text-3xl font-bold mb-4">Join thousands of businesses</h2>
-            <p className="text-lg text-blue-100 mb-8">
-              Start creating professional invoices and get paid faster
-            </p>
-            <div className="space-y-3 text-left max-w-sm mx-auto">
-              <div className="flex items-center gap-3">
-                <div className="flex h-6 w-6 items-center justify-center rounded-full bg-white/20">
-                  <span className="text-xs">✓</span>
-                </div>
-                <span className="text-blue-50">Unlimited invoices and customers</span>
-              </div>
-              <div className="flex items-center gap-3">
-                <div className="flex h-6 w-6 items-center justify-center rounded-full bg-white/20">
-                  <span className="text-xs">✓</span>
-                </div>
-                <span className="text-blue-50">Professional PDF generation</span>
-              </div>
-              <div className="flex items-center gap-3">
-                <div className="flex h-6 w-6 items-center justify-center rounded-full bg-white/20">
-                  <span className="text-xs">✓</span>
-                </div>
-                <span className="text-blue-50">Automated payment reminders</span>
-              </div>
-              <div className="flex items-center gap-3">
-                <div className="flex h-6 w-6 items-center justify-center rounded-full bg-white/20">
-                  <span className="text-xs">✓</span>
-                </div>
-                <span className="text-blue-50">Real-time analytics dashboard</span>
-              </div>
             </div>
           </div>
         </div>
