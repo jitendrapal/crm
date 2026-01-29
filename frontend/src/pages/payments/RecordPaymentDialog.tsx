@@ -16,7 +16,7 @@ const paymentSchema = z.object({
   amount: z.number().min(0.01, 'Amount must be greater than 0'),
   paymentMethod: z.nativeEnum(PaymentMethod),
   paymentDate: z.string().min(1, 'Payment date is required'),
-  reference: z.string().optional(),
+  transactionId: z.string().optional(),
   notes: z.string().optional(),
 });
 
@@ -33,7 +33,9 @@ export function RecordPaymentDialog({ open, onOpenChange }: RecordPaymentDialogP
   const { data: invoices } = useQuery({
     queryKey: ['unpaid-invoices'],
     queryFn: async () => {
-      const response = await api.get<{ data: Invoice[] }>('/invoices?status=SENT&limit=1000');
+      const response = await api.get<{ data: Invoice[] }>(
+        '/invoices?status=SENT&limit=1000'
+      );
       return response.data.data;
     },
     enabled: open,
@@ -53,7 +55,14 @@ export function RecordPaymentDialog({ open, onOpenChange }: RecordPaymentDialogP
   });
 
   const mutation = useMutation({
-    mutationFn: (data: PaymentForm) => api.post('/payments', data),
+    mutationFn: (data: PaymentForm) => {
+      // Convert date string to ISO datetime format
+      const paymentData = {
+        ...data,
+        paymentDate: new Date(data.paymentDate).toISOString(),
+      };
+      return api.post('/payments', paymentData);
+    },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['payments'] });
       queryClient.invalidateQueries({ queryKey: ['invoices'] });
@@ -78,7 +87,9 @@ export function RecordPaymentDialog({ open, onOpenChange }: RecordPaymentDialogP
       <div className="bg-card rounded-lg shadow-lg w-full max-w-md">
         <div className="p-6 border-b">
           <h2 className="text-2xl font-bold">Record Payment</h2>
-          <p className="text-sm text-muted-foreground">Record a payment received from a customer</p>
+          <p className="text-sm text-muted-foreground">
+            Record a payment received from a customer
+          </p>
         </div>
 
         <form onSubmit={handleSubmit(onSubmit)} className="p-6 space-y-4">
@@ -133,8 +144,12 @@ export function RecordPaymentDialog({ open, onOpenChange }: RecordPaymentDialogP
           </div>
 
           <div className="space-y-2">
-            <Label htmlFor="reference">Reference Number</Label>
-            <Input id="reference" placeholder="Transaction ID or check number" {...register('reference')} />
+            <Label htmlFor="transactionId">Transaction ID / Reference</Label>
+            <Input
+              id="transactionId"
+              placeholder="Transaction ID or check number"
+              {...register('transactionId')}
+            />
           </div>
 
           <div className="space-y-2">
@@ -155,4 +170,3 @@ export function RecordPaymentDialog({ open, onOpenChange }: RecordPaymentDialogP
     </div>
   );
 }
-
